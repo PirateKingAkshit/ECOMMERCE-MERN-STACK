@@ -1,13 +1,12 @@
 const asyncHandler = require("express-async-handler");
 const Joi = require("joi");
 const Cart = require("../models/cartModel");
-const Category = require("../models/categoryModel");
 
 const cartItemSchema = Joi.object({
   product: Joi.string().required().messages({
     "any.required": "Product ID is required",
   }),
-  quantity: Joi.number().integer().positive().required().messages({
+  quantity: Joi.number().integer().positive().default(1).messages({
     "number.base": "Quantity must be a number",
     "number.integer": "Quantity must be an integer",
     "number.positive": "Quantity must be positive",
@@ -45,11 +44,10 @@ const addToCart = asyncHandler(async (req, res) => {
   });
 
   if (error) {
-    const errors = error.details.map((err) => err.message);
-    return res.status(400).json({ errors });
+    return res.status(400).json({ error });
   }
 
-  const { product, quantity } = value;
+  const { product,quantity } = value;
 
   let cart = await Cart.findOne({ user })
     .populate({
@@ -78,39 +76,6 @@ const addToCart = asyncHandler(async (req, res) => {
   res.json(cart);
 });
 
-// @desc    Update item quantity in cart
-// @route   PUT /api/cart/update
-// @access  Protected
-const updateCart = asyncHandler(async (req, res) => {
-  const user = req.user._id;
-  const { error, value } = cartItemSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    const errors = error.details.map((err) => err.message);
-    return res.status(400).json({ errors });
-  }
-
-  const { product, quantity } = value;
-
-  let cart = await Cart.findOne({ user });
-
-  if (!cart) {
-    return res.status(404).json({ error: "Cart not found" });
-  }
-
-  const item = cart.items.find((item) => item.product.equals(product));
-
-  if (!item) {
-    return res.status(404).json({ error: "Item not found in cart" });
-  }
-
-  item.quantity = quantity;
-  await cart.save();
-
-  res.json(cart);
-});
 
 // @desc    Remove item from cart
 // @route   DELETE /api/cart/remove/:productId
@@ -133,17 +98,18 @@ const removeFromCart = asyncHandler(async (req, res) => {
 
 
 // @desc    Update entire cart for a user
-// @route   PUT /api/cart/update/:userId
+// @route   PUT /api/cart/update
 // @access  Protected
 const updateCartForUser = asyncHandler(async (req, res) => {
-  const userId = req.params.userId;
+  console.log(req.user)
+  const userId = req.user._id;
   const { items } = req.body;
 
   try {
-    let cart = await Cart.findOneAndUpdate(
+    let cart = await Cart.findByIdAndUpdate(
       { user: userId },
-      { items },
-      { new: true, upsert: true }
+      { items:items },
+      { new: true }
     ).populate("items.product");
 
     res.json(cart);
@@ -152,12 +118,11 @@ const updateCartForUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { updateCartForUser };
 
 
 module.exports = {
   getCart,
   addToCart,
-  updateCart,
   removeFromCart,
+  updateCartForUser
 };

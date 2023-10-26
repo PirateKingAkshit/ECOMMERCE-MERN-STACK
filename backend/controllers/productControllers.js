@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Joi = require("joi");
 const Product = require("../models/productModel");
+const Category = require("../models/categoryModel");
 
 // Joi Schema for product creation
 const productSchema = Joi.object({
@@ -58,23 +59,25 @@ const createProduct = asyncHandler(async (req, res) => {
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-  const { search } = req.query;
+  const { search, category } = req.query;
+
   let products;
 
+  let query = {};
+
   if (search) {
-    // If there's a search query
-    products = await Product.find({
-      name: { $regex: search, $options: "i" }, // Case-insensitive search by name
-     
-    }).populate("category");
-  } else {
-    // If no search query, fetch all products
-    products = await Product.find().populate("category");
+    query.name = { $regex: search, $options: "i" }; // Case-insensitive search by name
   }
 
+  if (category) {
+    query.category = category;
+  }
+
+  products = await Product.find(query).populate("category");
   const count = products.length;
   res.json({ count, products });
 });
+
 
 
 
@@ -136,10 +139,11 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 
 // @desc    Search products by category
-// @route   GET /api/products/category/:categoryId
+// @route   GET /api/products?category=categoryId
 // @access  Public
 const getProductsByCategory = asyncHandler(async (req, res) => {
-  const categoryId = req.params.categoryId;
+  const categoryId = req.query;
+  console.log(categoryId)
 
   const products = await Product.find({
     category: categoryId,

@@ -6,6 +6,7 @@ const {
   getCart,
   addToCart,
   updateCart,
+  updateCartForUser,
   removeFromCart,
 } = require("../controllers/cartControllers");
 
@@ -19,10 +20,10 @@ router.get("/",authenticateUser,getCart);
 // @access  Protected
 router.post("/add",authenticateUser, addToCart);
 
-// @desc    Update item quantity in cart
+// @desc    Update entire cart for a user
 // @route   PUT /api/cart/update
 // @access  Protected
-router.put("/update", updateCart);
+router.put("/update",authenticateUser, updateCartForUser);
 
 // @desc    Remove item from cart
 // @route   DELETE /api/cart/remove/:productId
