@@ -1,104 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Text, Image, Button, useToast } from '@chakra-ui/react';
+import React, { useEffect } from 'react';
+import { Box, Text, Image, Button } from '@chakra-ui/react';
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { UserState } from "./../../context/UserProvider";
-import axios from "axios";
-import { useLocation } from 'react-router-dom';
-
-
+import { CartState } from '../../context/CartProvider';
+import { UserState } from '../../context/UserProvider';
 
 const Cart = () => {
+
+  const{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,SHIPPING_CHARGES}=CartState()
   const { user } = UserState();
-  const [cart, setCart] = useState([]);
-  // const location = useLocation();
-  const toast = useToast();
-
- const fetchCart = async () => {
-   try {
-     const config = {
-       headers: {
-         Authorization: `Bearer ${user.token}`,
-       },
-     };
-     const { data } = await axios.get("http://localhost:8080/api/cart", config);
-     setCart(data.items);
-   } catch (error) {
-     console.log(error);
-   }
- };
-
  useEffect(() => {
    fetchCart();
+   // eslint-disable-next-line
  }, [user]);
-
- useEffect(() => {
-   localStorage.setItem("cart", JSON.stringify(cart));
- }, [cart]);
-
-
- const decreaseQuantity = (productId) => {
-   const updatedCart = cart.map((item) => {
-     if (item.product._id === productId) {
-       if (item.quantity > 1) {
-         item.quantity--;
-       } else {
-         toast({
-           title: "Minimum Quantity Reached",
-           description: "Quantity cannot be less than 1.",
-           status: "warning",
-           duration: 2000,
-           position:"top",
-           isClosable: true,
-         });
-       }
-     }
-     return item;
-   });
-
-   setCart(updatedCart);
-  //  localStorage.setItem("cart", JSON.stringify(updatedCart));
- };
-
- const increaseQuantity = (productId) => {
-   const updatedCart = cart.map((item) => {
-     if (item.product._id === productId) {
-       if (item.quantity < 5) {
-         item.quantity++;
-       } else {
-         toast({
-           title: "Maximum Quantity Reached",
-           description: "Quantity cannot be more than 5.",
-           status: "warning",
-           position: "top",
-           duration: 2000,
-           isClosable: true,
-         });
-       }
-     }
-     return item;
-   });
-
-   setCart(updatedCart);
-  //  localStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
-  
-  const removeFromCart = (productId) => {
-    const updatedCart = cart.filter((item) => item.product._id !== productId);
-    setCart(updatedCart);
-    // localStorage.setItem("cart", JSON.stringify(updatedCart));
-  };  
-
-  const cartTotal = () => {
-    let total = 0;
-    cart.forEach((item) => {
-      total += item.product.price * item.quantity;
-    });
-    return total;
-  };
-
-  const SHIPPING_CHARGES = 50;
-
 
   return (
     <>
@@ -110,7 +24,7 @@ const Cart = () => {
    width="100%"
    padding="5px"
  >
-   {/* Order Summary */}
+   {/* Cart Summary */}
    <Box
      width="65%"
      height="fit-content"
@@ -120,7 +34,7 @@ const Cart = () => {
      borderRadius="5px"
    >
      <Text fontSize="xl" mb="15px">
-       Order Summary
+       Cart Summary
      </Text>
      {cart.map((item) => (
        <Box

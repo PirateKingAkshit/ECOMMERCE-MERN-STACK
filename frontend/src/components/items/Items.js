@@ -1,8 +1,12 @@
 import React from "react";
-import { Box, Image, Flex, Text, Button } from "@chakra-ui/react";
+import { Box, Image, Text, Button } from "@chakra-ui/react";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import { CartState } from "../../context/CartProvider";
 
-const Items = ({item}) => {
+const Items = ({ item }) => {
+  const { addToCart } = CartState();
+
+  
   return (
     <Box
       borderWidth="1px"
@@ -37,6 +41,7 @@ const Items = ({item}) => {
           colorScheme="teal"
           variant="solid"
           leftIcon={<AddShoppingCartIcon />}
+          onClick={()=>addToCart(item._id)}
         >
           Add to Cart
         </Button>

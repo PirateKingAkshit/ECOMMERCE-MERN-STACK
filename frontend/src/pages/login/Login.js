@@ -57,7 +57,7 @@ const Login = () => {
       navigate("/");
     } catch (error) {
       error.response.data.error.map((err) => {
-        toast({
+         return toast({
           title: "Warning",
           description: err,
           status: "warning",
@@ -111,6 +111,11 @@ const Login = () => {
 
           <Button type="submit" colorScheme="blue" isLoading={loading}>
             Login
+          </Button>
+          <Button colorScheme="red" onClick={() => {
+            setFormData({ ...formData,email:"deepak@gmail.com",password:"deepak@123"  });
+          }}>
+            Guest User Credential
           </Button>
 
           <Text mt={2}>

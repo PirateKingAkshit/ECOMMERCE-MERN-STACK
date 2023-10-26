@@ -1,19 +1,17 @@
+import { useToast } from '@chakra-ui/react';
+import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { createSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const UserContext = createContext();
 
 const UserProvider = ({children}) => {
-    const [user, setUser] = useState();
-    const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = useState()
-    const searchItem = () => {
-      if (searchQuery) {
-        navigate(`/?${createSearchParams({ search: searchQuery })}`);
-      }
-      setSearchQuery("");
-    };
-
+  const [user, setUser] = useState();
+  const [category, setCategory] = useState([]);
+  const navigate = useNavigate();
+  
+  const toast=useToast()
+    
     useEffect(() => {
         try {
             const userData = JSON.parse(localStorage.getItem("userData"))
@@ -27,11 +25,60 @@ const UserProvider = ({children}) => {
         } catch (error) {
             console.error("Error parsing userData:", error);
         }
-    },[navigate])
+    }, [navigate])
+  
+
+  const logoutHandler = async () => {
+    const localCart = JSON.parse(localStorage.getItem("cart"));
+    if (localCart && localCart.length > 0) {
+      await axios.put(
+        "http://localhost:8080/api/cart/update",
+        {
+          items: localCart,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+    }
+
+    // Clear the local storage cart
+    localStorage.removeItem("cart");
+
+    localStorage.removeItem("userData");
+    toast({
+      title: "User Logged Out Successfully",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setUser(null);
+  };
+
+
+  const fetchCategory = async () => {
+    const config = {
+      headers: {
+        "Content-type": "Application/json",
+      },
+    };
+    const { data } = await axios.get(
+      "http://localhost:8080/api/categories",
+      config
+    );
+    setCategory(data.categories);
+  };
+  useEffect(() => {
+    fetchCategory();
+  }, []);
+
 
   return (
     <UserContext.Provider
-      value={{ user, setUser, searchQuery, setSearchQuery, searchItem }}
+      value={{ user, setUser,logoutHandler,category}}
     >
       {children}
     </UserContext.Provider>

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Box, Input, InputGroup, InputLeftElement, Text,useDisclosure, MenuItem,Menu, MenuButton, MenuList, MenuDivider, Button, Select, InputRightElement, useToast, } from "@chakra-ui/react";
+import React, { useState } from 'react'
+import { Box, Input, InputGroup, InputLeftElement, Text,useDisclosure, MenuItem,Menu, MenuButton, MenuList, MenuDivider, Button, InputRightElement, useToast, } from "@chakra-ui/react";
 import SearchIcon from "@mui/icons-material/Search";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -7,53 +7,23 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import InboxIcon from "@mui/icons-material/Inbox";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 import { UserState } from '../../context/UserProvider';
-import axios from "axios"
 
 const Navbar = () => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-  const [category, setCategory] = useState([])
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState();
   const toast = useToast();
-  const navigate=useNavigate()
-
+  const navigate = useNavigate()
+  const { user,logoutHandler,category } = UserState();
   
-  const { user, setUser,searchQuery, setSearchQuery, searchItem } = UserState();
-  
-  const logoutHandler = () => {
-
-    const localCart = JSON.parse(localStorage.getItem("cart"));
-    if (localCart && localCart.length > 0) {
-      localCart.forEach(async (item) => {
-        await axios.post(
-          "http://localhost:8080/api/cart/add",
-          {
-            product: item.product,
-            quantity: item.quantity,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-      });
+  const searchItem = () => {
+    if (searchQuery) {
+      navigate(`/?${createSearchParams({ search: searchQuery })}`);
     }
-
-    // Clear the local storage cart
-    localStorage.removeItem("cart");
-
-    localStorage.removeItem("userData")
-     toast({
-       title: "User Logged Out Successfully",
-       status:"success",
-       duration: 5000,
-       isClosable: true,
-       position:"bottom",
-     });
-    setUser(null);
-  }
+    setSearchQuery("");
+  };
 
   const handleCartClick = () => {
     if (!user) {
@@ -67,28 +37,13 @@ const Navbar = () => {
       });
       return;
     }
-    navigate("/cart")
+    navigate("/cart");
   };
 
-  const fetchCategory = async () => {
-    const config = {
-      headers: {
-        "Content-type":"Application/json"
-      }
-    }
-    const { data } = await axios.get("http://localhost:8080/api/categories", config);
-    setCategory(data.categories)
-    
-  }
-  useEffect(() => {
-    fetchCategory()
-  }, [])
 
-  const handleCategoryClick = (categoryName) => {
-
-    setSelectedCategory(categoryName);
-  };
-
+  
+  
+  
   return (
     <>
       <Box
@@ -98,11 +53,16 @@ const Navbar = () => {
         justifyContent={"space-around"}
         alignItems={"center"}
       >
-        <Link to="/">
-          <Text fontSize={"4xl"} color={"white"}>
+        {/* <Link to="/"> */}
+        <Box cursor="pointer" onClick={() => {
+          navigate("/")
+          setSelectedCategory("All")
+        }}>
+            <Text fontSize={"4xl"} color={"white"} >
             Urban<span style={{ color: "blue" }}>Utopia</span>
           </Text>
-        </Link>
+        </Box>
+        {/* </Link> */}
 
         <Box w={"50%"}>
           <InputGroup>
@@ -145,13 +105,19 @@ const Navbar = () => {
                   {selectedCategory}
                 </MenuButton>
                 <MenuList>
-                  <MenuItem onClick={() => handleCategoryClick("All")}>
+                  <MenuItem onClick={() => {
+                    setSelectedCategory("All");
+                    navigate("/"); 
+                  }}>
                     All
                   </MenuItem>
                   {category.map((cat) => (
                     <MenuItem
                       key={cat._id}
-                      onClick={() => handleCategoryClick(cat.name)}
+                      onClick={() => {
+                        setSelectedCategory(cat.name);
+                        navigate(`/?${createSearchParams({ category: cat._id })}`);
+                      }}
                     >
                       {cat.name}
                     </MenuItem>

@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import Items from './../../components/items/Items';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios'
-import { Flex, Spinner } from '@chakra-ui/react';
+import { Box, Button, Flex, Image, Spinner } from '@chakra-ui/react';
+
 
 const Products = () => {
-
-   const [loading, setLoading] = useState(true);
-   const [products, setProducts] = useState([]);
-   const [query] = useSearchParams();
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [query] = useSearchParams();
   const searchQuery = query.get("search");
+  const searchCategory = query.get("category");
 
-  const fetchProducts = async() => {
+  const fetchProducts = async () => {
     setLoading(true);
 
     try {
@@ -26,31 +27,47 @@ const Products = () => {
             `http://localhost:8080/api/products?search=${searchQuery}`,
             config
           )
-        : await axios.get(
-            `http://localhost:8080/api/products`,
+        : searchCategory
+        ? await axios.get(
+            `http://localhost:8080/api/products?category=${searchCategory}`,
             config
-          );
-      setProducts(data.products)
+          )
+        : await axios.get(`http://localhost:8080/api/products`, config);
+      setProducts(data.products);
       console.log(data.products);
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchProducts();
-  }, [searchQuery]);
+    // eslint-disable-next-line
+  }, [searchQuery, searchCategory]);
 
 
-  // if (!loading && searchQuery && !products.length) {
-  //   return (
-  //     <div className="no_prod_found">
-  //       <img src="https://tadobasolutions.com/img/nproduct.png" />
-  //     </div>
-  //   );
-  // }
   
+
+  if (!loading && searchQuery && !products.length) {
+    return (
+      <Box textAlign="center">
+        <Image
+          width={"400px"}
+          mx={490}
+          src="https://evgracias.com/images/no-products.jpg" />
+        <Box >
+          {/* <p>No Products Found</p> */}
+          <Button colorScheme='green' as={Link} to="/">
+            Go to Main Page
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
+
+
+
   return (
     <>
       {loading ? (
