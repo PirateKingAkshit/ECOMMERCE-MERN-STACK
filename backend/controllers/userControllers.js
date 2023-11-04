@@ -126,6 +126,7 @@ const loginUser = asyncHandler(async (req, res) => {
     name: user.name,
     email: user.email,
     address: user.address,
+    isAdmin:user.isAdmin,
     token,
   });
 });

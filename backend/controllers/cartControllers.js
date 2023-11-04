@@ -101,12 +101,13 @@ const removeFromCart = asyncHandler(async (req, res) => {
 // @route   PUT /api/cart/update
 // @access  Protected
 const updateCartForUser = asyncHandler(async (req, res) => {
-  console.log(req.user)
+  // console.log(req.user)
   const userId = req.user._id;
   const { items } = req.body;
+ 
 
   try {
-    let cart = await Cart.findByIdAndUpdate(
+    let cart = await Cart.findOneAndUpdate(
       { user: userId },
       { items:items },
       { new: true }
@@ -114,7 +115,8 @@ const updateCartForUser = asyncHandler(async (req, res) => {
 
     res.json(cart);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    // console.log(error)
+    res.status(500).json({ error });
   }
 });
 

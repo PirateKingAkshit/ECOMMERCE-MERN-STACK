@@ -83,7 +83,7 @@ const getProducts = asyncHandler(async (req, res) => {
 
 
 // @desc    Get a single product by ID
-// @route   GET /api/products/id
+// @route   GET /api/products/:id
 // @access  Public
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id).populate("category");
@@ -125,7 +125,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 });
 
 // @desc   Delete a product by id
-// @route  PUT /api/products/id
+// @route  DELETE /api/products/id
 // @access Protected
 const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findByIdAndDelete(req.params.id);
