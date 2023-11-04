@@ -34,7 +34,7 @@ const Products = () => {
           )
         : await axios.get(`http://localhost:8080/api/products`, config);
       setProducts(data.products);
-      console.log(data.products);
+      
       setLoading(false);
     } catch (error) {
       console.log(error);

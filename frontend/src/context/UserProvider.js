@@ -28,35 +28,7 @@ const UserProvider = ({children}) => {
     }, [navigate])
   
 
-  const logoutHandler = async () => {
-    const localCart = JSON.parse(localStorage.getItem("cart"));
-    if (localCart && localCart.length > 0) {
-      await axios.put(
-        "http://localhost:8080/api/cart/update",
-        {
-          items: localCart,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-    }
-
-    // Clear the local storage cart
-    localStorage.removeItem("cart");
-
-    localStorage.removeItem("userData");
-    toast({
-      title: "User Logged Out Successfully",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-      position: "bottom",
-    });
-    setUser(null);
-  };
+  
 
 
   const fetchCategory = async () => {
@@ -78,7 +50,7 @@ const UserProvider = ({children}) => {
 
   return (
     <UserContext.Provider
-      value={{ user, setUser,logoutHandler,category}}
+      value={{ user, setUser,category}}
     >
       {children}
     </UserContext.Provider>

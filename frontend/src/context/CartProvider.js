@@ -13,11 +13,8 @@ const CartProvider = ({ children }) => {
     const SHIPPING_CHARGES = 50;
 
     const fetchCart = async () => {
-      const localCart = JSON.parse(localStorage.getItem("cart"));
-      if (localCart && localCart.length > 0) {
-        setCart(localCart);
-      } else {
-        try {
+      try {
+        
           const config = {
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -27,14 +24,19 @@ const CartProvider = ({ children }) => {
             "http://localhost:8080/api/cart",
             config
           );
-          setCart(data.items);
-        } catch (error) {
-          console.log(error);
-        }
+
+          if (data) {
+            localStorage.setItem("cart", JSON.stringify(data.items));
+            setCart(data.items);
+          }
+
+      } catch (error) {
+        console.log(error);
       }
     };
 
-    const decreaseQuantity = (productId) => {
+
+    const decreaseQuantity = async(productId) => {
       const updatedCart = cart.map((item) => {
         if (item.product._id === productId) {
           if (item.quantity > 1) {
@@ -55,9 +57,21 @@ const CartProvider = ({ children }) => {
 
       setCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+        await axios.put(
+          "http://localhost:8080/api/cart/update",
+          {
+            items: updatedCart,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
     };
 
-    const increaseQuantity = (productId) => {
+    const increaseQuantity = async(productId) => {
       const updatedCart = cart.map((item) => {
         if (item.product._id === productId) {
           if (item.quantity < 5) {
@@ -78,12 +92,34 @@ const CartProvider = ({ children }) => {
 
       setCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
+      await axios.put(
+        "http://localhost:8080/api/cart/update",
+        {
+          items: updatedCart,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      )
     };
 
-    const removeFromCart = (productId) => {
+    const removeFromCart = async(productId) => {
       const updatedCart = cart.filter((item) => item.product._id !== productId);
       setCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
+        await axios.put(
+          "http://localhost:8080/api/cart/update",
+          {
+            items: updatedCart,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
     };
 
     const cartTotal = () => {
@@ -103,7 +139,9 @@ const CartProvider = ({ children }) => {
           isClosable: true,
           position: "top",
         });
+        return;
       }
+
       try {
         const config = {
           headers: {
@@ -117,29 +155,12 @@ const CartProvider = ({ children }) => {
           { product: productId, quantity: 1 },
           config
         );
-        if (data) {
-          toast({
-            title: `product added to the cart`,
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-            position: "top",
-          });
-        }
       } catch (error) {
         console.log(error);
-        //  error.response.data.error.map((err) => {
-        //    toast({
-        //      title: "Warning",
-        //      description: err,
-        //      status: "warning",
-        //      duration: 5000,
-        //      isClosable: true,
-        //      position: "top",
-        //    });
-        //  });
+        // Handle error if needed
       }
     };
+
 
 
 

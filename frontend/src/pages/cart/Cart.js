@@ -1,145 +1,213 @@
-import React, { useEffect } from 'react';
-import { Box, Text, Image, Button } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { Box, Text, Image, Button, Toast, useToast, Spinner } from '@chakra-ui/react';
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { CartState } from '../../context/CartProvider';
 import { UserState } from '../../context/UserProvider';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
 
-  const{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,SHIPPING_CHARGES}=CartState()
+  const{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,setCart,SHIPPING_CHARGES}=CartState()
   const { user } = UserState();
- useEffect(() => {
+  const toast = useToast();
+   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+   setLoading(true)
    fetchCart();
-   // eslint-disable-next-line
+   setLoading(false)
  }, [user]);
+  
+    const orderHandler = async() => {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+      try {
+        const { data } = await axios.post("http://localhost:8080/api/orders", { user: user._id, cart: cart, address: user.address, }, config)
+        if (data) {
+          navigate("/orders");
+          toast({
+            title: `Order Succesfull`,
+            status: "success",
+            duration: 2000,
+            isClosable: true,
+            position: "top",
+          })
+
+          setCart([]);
+
+          localStorage.removeItem("cart");
+          await axios.put(
+            "http://localhost:8080/api/cart/update",
+            {
+              items: [],
+            },
+            config
+          );
+          
+        }
+      }
+      catch (error) {
+        console.log(error)
+      }
+      
+      
+    }
 
   return (
     <>
-      {cart.length > 0 ? (
-        <Box
-   display="flex"
-   justifyContent="space-around"
-   alignItems="start"
-   width="100%"
-   padding="5px"
- >
-   {/* Cart Summary */}
-   <Box
-     width="65%"
-     height="fit-content"
-     padding="15px"
-     boxShadow="md"
-     backgroundColor="aqua"
-     borderRadius="5px"
-   >
-     <Text fontSize="xl" mb="15px">
-       Cart Summary
-     </Text>
-     {cart.map((item) => (
-       <Box
-         key={item.product._id}
-         display="flex"
-         justifyContent="space-around"
-         width="100%"
-         marginBottom="20px"
-         boxShadow="md"
-         backgroundColor="white"
-         borderRadius="5px"
-       >
-         <Image
-           src={item.product.image}
-           alt=""
-           boxSize="150px"
-           borderRadius="10px"
-           padding="10px 0px"
-         />
-         <Box width="50%" height="fit-content">
-           <a href={`/product/${item.product._id}`} className="cart_link">
-             <Text fontSize="20px" fontWeight="bold">
-               {item.product.name}
-             </Text>
-           </a>
-           <Text color="blueviolet" fontSize="20px">
-             ${item.product.price}
-           </Text>
-         </Box>
-         <Box
-           display="flex"
-           flexDirection="column"
-           justifyContent="space-evenly"
-         >
-           <Box display="flex" alignItems="center">
-             <Button
-               size="sm"
-               onClick={() => decreaseQuantity(item.product._id)}
-               disabled={item.quantity === 1}
-             >
-               <RemoveIcon />
-             </Button>
-             <Text fontSize="30px" color="blue">
-               {item.quantity}
-             </Text>
-             <Button
-               size="sm"
-               onClick={() => increaseQuantity(item.product._id)}
-               disabled={item.quantity === 5}
-             >
-               <AddIcon />
-             </Button>
-           </Box>
-           <Button
-             className="remove"
-             onClick={() => removeFromCart(item.product._id)}
-             fontFamily="Dancing Script"
-             width="60%"
-             height="35px"
-             backgroundColor="rgb(112, 112, 245)"
-             borderRadius="5px"
-             color="white"
-             fontSize="18px"
-           >
-             Remove
-           </Button>
-         </Box>
-       </Box>
-     ))}
-   </Box>
-
-   {/* Payment Summary */}
-   <Box
-     width="25%"
-     position="sticky"
-     top="20px"
-     padding="10px"
-     boxShadow="md"
-     backgroundColor="white"
-     borderRadius="5px"
-   >
-     <Text fontSize="xl">Payment Summary</Text>
-     {/* Subtotal */}
-     <Text>
-       Subtotal: <span style={{ color: "blue" }}>${cartTotal()}</span>
-     </Text>
-     {/* Shipping Fee */}
-     <Text>
-       Shipping Fee: <span style={{ color: "blue" }}>${SHIPPING_CHARGES}</span>
-     </Text>
-     <Box borderBottom="1px solid #ccc" my="2" />
-     {/* Total */}
-     <Text>
-       Total:{" "}
-       <span style={{ color: "blue" }}>${cartTotal() + SHIPPING_CHARGES}</span>
-     </Text>
-     <Box borderBottom="1px solid #ccc" my="2" />
-   </Box>
- </Box>
+      {loading ? (
+        <>
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="black"
+            size="xl"
+            m={"200px 615px"}
+            width={"100px"}
+            height={"100px"}
+          />
+        </>
       ) : (
-        <Box textAlign="center">
-          <Text fontSize="xl" mb="15px">
-            Your cart is empty
-          </Text>
-        </Box>
+        <>
+          {cart.length > 0 ? (
+            <Box
+              display="flex"
+              justifyContent="space-around"
+              alignItems="start"
+              width="100%"
+              padding="5px"
+            >
+              {/* Cart Summary */}
+              <Box
+                width="65%"
+                height="fit-content"
+                padding="15px"
+                boxShadow="md"
+                backgroundColor="aqua"
+                borderRadius="5px"
+              >
+                <Text fontSize="xl" mb="15px">
+                  Cart Summary
+                </Text>
+                {cart.map((item) => (
+                  <Box
+                    key={item.product._id}
+                    display="flex"
+                    justifyContent="space-around"
+                    width="100%"
+                    marginBottom="20px"
+                    boxShadow="md"
+                    backgroundColor="white"
+                    borderRadius="5px"
+                  >
+                    <Image
+                      src={item.product.image}
+                      alt=""
+                      boxSize="150px"
+                      borderRadius="10px"
+                      padding="10px 0px"
+                      onClick={() => navigate(`/product/${item.product._id}`)}
+                    />
+                    <Box width="50%" height="fit-content">
+                      <Text fontSize="20px" fontWeight="bold">
+                        {item.product.name}
+                      </Text>
+                      <Text color="blueviolet" fontSize="20px">
+                        ${item.product.price}
+                      </Text>
+                    </Box>
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="space-evenly"
+                    >
+                      <Box display="flex" alignItems="center">
+                        <Button
+                          size="sm"
+                          onClick={() => decreaseQuantity(item.product._id)}
+                          disabled={item.quantity === 1}
+                        >
+                          <RemoveIcon />
+                        </Button>
+                        <Text fontSize="30px" color="blue">
+                          {item.quantity}
+                        </Text>
+                        <Button
+                          size="sm"
+                          onClick={() => increaseQuantity(item.product._id)}
+                          disabled={item.quantity === 5}
+                        >
+                          <AddIcon />
+                        </Button>
+                      </Box>
+                      <Button
+                        onClick={() => removeFromCart(item.product._id)}
+                        colorScheme="messenger"
+                        width={"100%"}
+                      >
+                        Remove
+                      </Button>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+
+              {/* Payment Summary */}
+              <Box
+                width="25%"
+                position="sticky"
+                top="20px"
+                padding="10px"
+                boxShadow="lg"
+                backgroundColor="white"
+                borderRadius="5px"
+              >
+                <Text fontSize="xl">Payment Summary</Text>
+                {/* Subtotal */}
+                <Text>
+                  Subtotal:{" "}
+                  <span style={{ color: "blue" }}>${cartTotal()}</span>
+                </Text>
+                {/* Shipping Fee */}
+                <Text>
+                  Shipping Fee:{" "}
+                  <span style={{ color: "blue" }}>${SHIPPING_CHARGES}</span>
+                </Text>
+                <Box borderBottom="1px solid #ccc" my="2" />
+                {/* Total */}
+                <Text>
+                  Total:{" "}
+                  <span style={{ color: "blue" }}>
+                    ${cartTotal() + SHIPPING_CHARGES}
+                  </span>
+                </Text>
+                <Box borderBottom="1px solid #ccc" my="2" />
+                <Button
+                  colorScheme="messenger"
+                  width={"100%"}
+                  onClick={() => orderHandler()}
+                >
+                  Order
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <Box textAlign="center">
+              <Text>Your Cart Is Empty</Text>
+              <Button colorScheme="blue" mt="4" onClick={() => navigate("/")}>
+                Go to Main Page
+              </Button>
+            </Box>
+          )}
+        </>
       )}
     </>
   );

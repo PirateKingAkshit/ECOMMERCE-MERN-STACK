@@ -56,17 +56,32 @@ const Login = () => {
       setLoading(false);
       navigate("/");
     } catch (error) {
-      error.response.data.error.map((err) => {
-         return toast({
+      const errors = error.response.data.error;
+
+      if (Array.isArray(errors)) {
+        errors.forEach((err) => {
+          toast({
+            title: "Warning",
+            description: err,
+            status: "warning",
+            duration: 2000,
+            isClosable: true,
+            position: "top",
+          });
+          setLoading(false);
+        });
+      } else {
+        toast({
           title: "Warning",
-          description: err,
+          description: errors,
           status: "warning",
-          duration: 5000,
+          duration: 2000,
           isClosable: true,
           position: "top",
         });
-      });
-      setLoading(false);
+        setLoading(false);
+      }
+
     }
   };
 

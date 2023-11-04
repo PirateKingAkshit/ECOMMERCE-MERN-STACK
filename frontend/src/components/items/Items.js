@@ -1,11 +1,16 @@
 import React from "react";
-import { Box, Image, Text, Button } from "@chakra-ui/react";
+import { Box, Image, Text, Button, Flex } from "@chakra-ui/react";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { CartState } from "../../context/CartProvider";
+import { useNavigate } from "react-router-dom";
+import { UserState } from "../../context/UserProvider";
+import UpdateProductModal from "../../pages/admin/UpdateProductModal";
+import DeleteProductModal from "../../pages/admin/DeleteProductModal";
 
 const Items = ({ item }) => {
   const { addToCart } = CartState();
-
+  const navigate = useNavigate()
+  const { user } = UserState();
   
   return (
     <Box
@@ -25,7 +30,14 @@ const Items = ({ item }) => {
       flexDir={"column"}
       justifyContent={"space-between"}
     >
-      <Image src={item.image} alt={""} mb="4" maxW={"220px"} maxH={"300px"} />
+      <Image
+        src={item.image}
+        alt={""}
+        mb="4"
+        maxW={"220px"}
+        maxH={"300px"}
+        onClick={() => navigate(`/product/${item._id}`)}
+      />
       <Box>
         <Text fontWeight="bold" fontSize="lg" mb="2">
           {item.name}
@@ -36,15 +48,34 @@ const Items = ({ item }) => {
         <Text color="gray.500" mb="4">
           Brand: {item.brand}
         </Text>
-        <Button
-          w={"100%"}
-          colorScheme="teal"
-          variant="solid"
-          leftIcon={<AddShoppingCartIcon />}
-          onClick={()=>addToCart(item._id)}
-        >
-          Add to Cart
-        </Button>
+        {user && user.isAdmin ? (
+          <>
+            <Flex justifyContent="space-around">
+              <UpdateProductModal item={item}> 
+                <Button colorScheme="yellow" variant="solid" >
+                  Update
+                </Button>
+              </UpdateProductModal>
+              <DeleteProductModal item={item}>
+              <Button colorScheme="red" variant="solid">
+                Delete
+              </Button>
+              </DeleteProductModal>
+            </Flex>
+          </>
+        ) : (
+          <>
+            <Button
+              w={"100%"}
+              colorScheme="teal"
+              variant="solid"
+              leftIcon={<AddShoppingCartIcon />}
+              onClick={() => addToCart(item._id)}
+            >
+              Add to Cart
+            </Button>
+          </>
+        )}
       </Box>
     </Box>
   );

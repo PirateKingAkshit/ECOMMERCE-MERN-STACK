@@ -7,8 +7,10 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import InboxIcon from "@mui/icons-material/Inbox";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 import { UserState } from '../../context/UserProvider';
+import axios from 'axios';
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -16,7 +18,9 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState();
   const toast = useToast();
   const navigate = useNavigate()
-  const { user,logoutHandler,category } = UserState();
+  const { user,setUser,category } = UserState();
+
+  
   
   const searchItem = () => {
     if (searchQuery) {
@@ -24,6 +28,37 @@ const Navbar = () => {
     }
     setSearchQuery("");
   };
+
+  const logoutHandler = async() => {
+    const localCart = JSON.parse(localStorage.getItem("cart"));
+    if (localCart && localCart.length > 0) {
+      await axios.put(
+        "http://localhost:8080/api/cart/update",
+        {
+          items: localCart,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+    }
+
+    // Clear the local storage cart
+    localStorage.removeItem("cart");
+
+    localStorage.removeItem("userData");
+    toast({
+      title: "User Logged Out Successfully",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setUser(null);
+    navigate("/")
+  }
 
   const handleCartClick = () => {
     if (!user) {
@@ -53,16 +88,17 @@ const Navbar = () => {
         justifyContent={"space-around"}
         alignItems={"center"}
       >
-        {/* <Link to="/"> */}
-        <Box cursor="pointer" onClick={() => {
-          navigate("/")
-          setSelectedCategory("All")
-        }}>
-            <Text fontSize={"4xl"} color={"white"} >
+        <Box
+          cursor="pointer"
+          onClick={() => {
+            navigate("/");
+            setSelectedCategory("All");
+          }}
+        >
+          <Text fontSize={"4xl"} color={"white"}>
             Urban<span style={{ color: "blue" }}>Utopia</span>
           </Text>
         </Box>
-        {/* </Link> */}
 
         <Box w={"50%"}>
           <InputGroup>
@@ -105,10 +141,12 @@ const Navbar = () => {
                   {selectedCategory}
                 </MenuButton>
                 <MenuList>
-                  <MenuItem onClick={() => {
-                    setSelectedCategory("All");
-                    navigate("/"); 
-                  }}>
+                  <MenuItem
+                    onClick={() => {
+                      setSelectedCategory("All");
+                      navigate("/");
+                    }}
+                  >
                     All
                   </MenuItem>
                   {category.map((cat) => (
@@ -116,7 +154,9 @@ const Navbar = () => {
                       key={cat._id}
                       onClick={() => {
                         setSelectedCategory(cat.name);
-                        navigate(`/?${createSearchParams({ category: cat._id })}`);
+                        navigate(
+                          `/?${createSearchParams({ category: cat._id })}`
+                        );
                       }}
                     >
                       {cat.name}
@@ -158,15 +198,44 @@ const Navbar = () => {
                 )}
               </MenuItem>
               <MenuDivider />
-              {user && (
+              {user && user.isAdmin && (
                 <>
-                  <MenuItem fontSize={"20px"} _hover={{ color: "blue" }}>
-                    <InboxIcon />
-                    Orders
-                  </MenuItem>
+                  <Link to="/adminOrders">
+                    <MenuItem fontSize={"20px"} _hover={{ color: "blue" }}>
+                      <InboxIcon />
+                      Orders
+                    </MenuItem>
+                  </Link>
                   <MenuDivider />
                 </>
               )}
+              {user && !user.isAdmin && (
+                <>
+                  <Link to="/orders">
+                    <MenuItem fontSize={"20px"} _hover={{ color: "blue" }}>
+                      <InboxIcon />
+                      Orders
+                    </MenuItem>
+                  </Link>
+                  <MenuDivider />
+                </>
+              )}
+
+              {user && user.isAdmin && (
+                <>
+                  <Link to="/addProduct">
+                  <MenuItem
+                    fontSize={"20px"}
+                    _hover={{ color: "blue" }}
+                  >
+                      <AddCircleOutlineIcon />
+                      Add Product
+                  </MenuItem>
+                    </Link>
+                  <MenuDivider />
+                </>
+              )}
+
               {user && (
                 <MenuItem
                   fontSize={"20px"}
@@ -183,14 +252,26 @@ const Navbar = () => {
           </Menu>
         </Box>
 
-        <Button
-          _hover={{ color: "blue" }}
-          fontSize={"25px"}
-          colorScheme="black"
-          onClick={handleCartClick}
-        >
-          <ShoppingCartIcon /> Cart
-        </Button>
+        {user && user.isAdmin ? (
+          <></>
+        ) : (
+          <Button
+            _hover={{ color: "blue" }}
+            fontSize={"25px"}
+            colorScheme="black"
+            onClick={handleCartClick}
+          >
+            <ShoppingCartIcon /> Cart
+          </Button>
+        )}
+        {/* <Button
+            _hover={{ color: "blue" }}
+            fontSize={"25px"}
+            colorScheme="black"
+            onClick={handleCartClick}
+          >
+            <ShoppingCartIcon /> Cart
+          </Button> */}
       </Box>
     </>
   );
