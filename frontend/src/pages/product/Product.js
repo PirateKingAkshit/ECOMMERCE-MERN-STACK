@@ -35,7 +35,6 @@ const Product = () => {
       );
       setProduct(data);
       
-      console.log(data)
       setLoading(false);
     } catch (error) {
       console.log(error);

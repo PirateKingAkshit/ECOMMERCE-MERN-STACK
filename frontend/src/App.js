@@ -9,6 +9,9 @@ import Signup from './pages/signup/Signup';
 import Order from './pages/order/Order';
 import AdminOrders from './pages/admin/AdminOrders';
 import AddProduct from './pages/admin/AddProduct';
+import MyProfile from './pages/My Profile/MyProfile';
+import ForgotPasswordForm from './pages/forgot-password/ForgotPasswordForm';
+import ResetPasswordForm from './pages/forgot-password/ResetPasswordForm';
 
 function App() {
 
@@ -18,6 +21,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Products />} />
+        <Route path="/profile" element={<MyProfile />} />
         <Route path="/adminOrders" element={<AdminOrders />} />
         <Route path="/addProduct" element={<AddProduct />} />
         <Route path="/product/:productId" element={<Product />} />
@@ -25,6 +29,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/orders" element={<Order />} />
+        <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+        <Route path="/change-password" element={<ForgotPasswordForm />} />
+        <Route path="/reset-password/:id/:token" element={<ResetPasswordForm />} />
       </Routes>
     </div>
   );

@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   FormControl,
+  HStack,
   IconButton,
   Input,
   InputGroup,
@@ -15,7 +16,7 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -48,7 +49,7 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
-        setLoading(false)
+      setLoading(false);
       return;
     }
 
@@ -60,7 +61,13 @@ const Signup = () => {
       };
       const { data } = await axios.post(
         "http://localhost:8080/api/user/register",
-        {name,email,password,phoneNumber,address:{houseNo,city,zip,state,country}},
+        {
+          name,
+          email,
+          password,
+          phoneNumber,
+          address: { houseNo, city, zip, state, country },
+        },
         config
       );
       toast({
@@ -84,44 +91,65 @@ const Signup = () => {
           isClosable: true,
           position: "top",
         });
-          setLoading(false)
+        setLoading(false);
+        return null;
       });
-       
     }
   };
 
   return (
-    <Box maxW="md" mx="auto" mt={8} p={6} borderWidth={1} borderRadius="lg">
-      <Text fontSize="2xl" fontWeight={"bold"} mb={4} textAlign={"center"}>
+    <Box
+      maxW="md"
+      mx="auto"
+      my={8}
+      p={6}
+      borderWidth={1}
+      borderRadius="lg"
+      bg="teal.200"
+    >
+      <Text
+        fontSize="2xl"
+        fontWeight={"bold"}
+        mb={4}
+        textAlign={"center"}
+        color="blue"
+      >
         SignUp
       </Text>
       <form onSubmit={handleSubmit}>
         <Stack spacing={4}>
-          <FormControl isInvalid={name === ""}>
+          <FormControl>
             <Input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Full Name"
+              required
+              bg="white"
+              color="teal.800"
             />
           </FormControl>
-
-          <FormControl isInvalid={email === ""}>
+          <FormControl>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email Address"
+              required
+              bg="white"
+              color="teal.800"
             />
           </FormControl>
-
-          <FormControl isInvalid={password === ""}>
+          <FormControl>
             <InputGroup>
               <Input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
+                required
+                bg="white"
+                color="teal.800"
               />
               <InputRightElement width="4.5rem">
                 <IconButton
@@ -135,14 +163,16 @@ const Signup = () => {
               </InputRightElement>
             </InputGroup>
           </FormControl>
-
-          <FormControl isInvalid={confirmPassword !== password}>
+          <FormControl>
             <InputGroup>
               <Input
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm Password"
+                required
+                bg="white"
+                color="teal.800"
               />
               <InputRightElement width="4.5rem">
                 <IconButton
@@ -160,8 +190,8 @@ const Signup = () => {
               </InputRightElement>
             </InputGroup>
           </FormControl>
-
-          <FormControl isInvalid={phoneNumber === ""}>
+          ;
+          <FormControl>
             <InputGroup>
               <InputLeftAddon children="+91" />
               <Input
@@ -169,62 +199,96 @@ const Signup = () => {
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="Phone Number"
+                required
+                bg="white"
+                color="teal.800"
               />
             </InputGroup>
           </FormControl>
-
-          <FormControl isInvalid={houseNo === ""}>
+          <FormControl>
             <Input
               type="text"
               value={houseNo}
               onChange={(e) => setHouseNo(e.target.value)}
               placeholder="House No."
+              required
+              bg="white"
+              color="teal.800"
             />
           </FormControl>
+          <HStack spacing={4}>
+            <FormControl>
+              <Input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="City"
+                required
+                bg="white"
+                color="teal.800"
+              />
+            </FormControl>
 
-          <FormControl isInvalid={city === ""}>
-            <Input
-              type="text"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="City"
-            />
-          </FormControl>
+            <FormControl>
+              <Input
+                type="text"
+                value={zip}
+                onChange={(e) => setZip(e.target.value)}
+                placeholder="ZIP"
+                required
+                bg="white"
+                color="teal.800"
+              />
+            </FormControl>
+          </HStack>
+          <HStack spacing={4}>
+            <FormControl>
+              <Input
+                type="text"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                placeholder="State"
+                required
+                bg="white"
+                color="teal.800"
+              />
+            </FormControl>
 
-          <FormControl isInvalid={zip === ""}>
-            <Input
-              type="text"
-              value={zip}
-              onChange={(e) => setZip(e.target.value)}
-              placeholder="ZIP"
-            />
-          </FormControl>
-
-          <FormControl isInvalid={state === ""}>
-            <Input
-              type="text"
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-              placeholder="State"
-            />
-          </FormControl>
-
-          <FormControl isInvalid={country === ""}>
-            <Input
-              type="text"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              placeholder="Country"
-            />
-          </FormControl>
-
-          <Button type="submit" colorScheme="blue" isLoading={loading}>
+            <FormControl>
+              <Input
+                type="text"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="Country"
+                required
+                bg="white"
+                color="teal.800"
+              />
+            </FormControl>
+          </HStack>
+          ;
+          <Button
+            type="submit"
+            colorScheme="blue"
+            isLoading={loading}
+            bg="teal.500"
+            color="white"
+          >
             Signup
           </Button>
         </Stack>
       </form>
+      <Text mt={2} color="teal.800">
+        Not registered yet?{" "}
+        <Link to="/login" color="blue.500">
+          Login
+        </Link>
+      </Text>
     </Box>
   );
 };
 
 export default Signup;
+
+
+

@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
+var nodemailer = require("nodemailer");
 const User = require("../models/userModel");
 
 // Joi Schema for user registration
@@ -81,6 +82,8 @@ const registerUser = asyncHandler(async (req, res) => {
     name: user.name,
     email: user.email,
     address: user.address,
+    isAdmin: user.isAdmin,
+    phoneNumber: user.phoneNumber,
     token,
   });
 });
@@ -126,9 +129,96 @@ const loginUser = asyncHandler(async (req, res) => {
     name: user.name,
     email: user.email,
     address: user.address,
-    isAdmin:user.isAdmin,
+    isAdmin: user.isAdmin,
+    phoneNumber: user.phoneNumber,
     token,
   });
 });
 
-module.exports = { registerUser, loginUser };
+const updateUser = asyncHandler(async (req, res) => {
+  const { phoneNumber, address } = req.body;
+  const authorizationHeader = req.headers.authorization;
+  const token = authorizationHeader.split(" ")[1];
+
+  const user = await User.findByIdAndUpdate({_id:req.user._id}, {
+    phoneNumber,address
+  }, { new: true })
+
+
+  res.status(200).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    address: user.address,
+    isAdmin: user.isAdmin,
+    phoneNumber: user.phoneNumber,
+    token,
+  });
+
+})
+
+const forgotPasswordController = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User Not Found ! ! !" });
+    }
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    await User.findByIdAndUpdate(
+      { _id: user._id },
+      { passwordResetToken: token },
+      { new: true }
+    );
+
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "akshitkumar383@gmail.com",
+        pass: `${process.env.APPLICATION_SPECIFIC_PASSWORD}`,
+      },
+    });
+
+    var mailOptions = {
+      from: "akshitkumar383@gmail.com",
+      to: `${user.email}`,
+      subject: "Reset Your Password",
+      text: `http://localhost:3000/reset-password/${user._id}/${token}`,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error sending reset link" });
+      } else {
+        return res
+          .status(200)
+          .json({ message: "Reset link sent to your mail" });
+      }
+    });
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+};
+
+const resetPasswordController = async (req, res) => {
+  const { id, token } = req.params;
+  const { password } = req.body;
+  console.log(id,token,password)
+  let verify;
+try {
+  verify = jwt.verify(token, process.env.JWT_SECRET);
+} catch (error) {
+  return res.status(404).json({ message: "Error with token" });
+}
+
+    const hashPassword=await bcrypt.hash(password, 10)
+    await User.findByIdAndUpdate({ _id: id }, { password: hashPassword }, { new: true });
+    res.status(200).json({ message: "Password Updated" });
+  
+}
+
+
+module.exports = { registerUser, loginUser, updateUser,forgotPasswordController,resetPasswordController };

@@ -2,12 +2,14 @@ import React, { useState } from 'react'
 import { UserState } from '../../context/UserProvider';
 import {  Button, HStack, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const DeleteProductModal = ({ children,item }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
     const { user } = UserState();
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleProductDelete = async () => {
         
@@ -30,6 +32,7 @@ const DeleteProductModal = ({ children,item }) => {
             position: "top",
           });
           setLoading(false);
+          navigate("/");
           window.location.reload();
         } catch (error) {
           toast({

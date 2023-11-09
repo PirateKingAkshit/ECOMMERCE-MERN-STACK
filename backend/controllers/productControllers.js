@@ -59,7 +59,7 @@ const createProduct = asyncHandler(async (req, res) => {
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-  const { search, category } = req.query;
+  const { search, category, minPrice, maxPrice } = req.query;
 
   let products;
 
@@ -73,10 +73,19 @@ const getProducts = asyncHandler(async (req, res) => {
     query.category = category;
   }
 
+  if (minPrice && maxPrice) {
+    query.price = { $gte: minPrice, $lte: maxPrice };
+  } else if (minPrice) {
+    query.price = { $gte: minPrice };
+  } else if (maxPrice) {
+    query.price = { $lte: maxPrice };
+  }
+
   products = await Product.find(query).populate("category");
   const count = products.length;
   res.json({ count, products });
 });
+
 
 
 
@@ -125,7 +134,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 });
 
 // @desc   Delete a product by id
-// @route  DELETE /api/products/id
+// @route  DELETE /api/products/:id
 // @access Protected
 const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findByIdAndDelete(req.params.id);

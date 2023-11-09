@@ -47,7 +47,7 @@ const Login = () => {
       toast({
         title: "Login Successfull",
         status: "success",
-        duration: 5000,
+        duration: 2000,
         isClosable: true,
         position: "bottom",
       });
@@ -127,18 +127,36 @@ const Login = () => {
           <Button type="submit" colorScheme="blue" isLoading={loading}>
             Login
           </Button>
-          <Button colorScheme="red" onClick={() => {
-            setFormData({ ...formData,email:"deepak@gmail.com",password:"deepak@123"  });
-          }}>
+          <Button
+            colorScheme="red"
+            onClick={() => {
+              setFormData({
+                ...formData,
+                email: "deepak@gmail.com",
+                password: "deepak@123",
+              });
+            }}
+          >
             Guest User Credential
           </Button>
 
-          <Text mt={2}>
-            Not registered yet?{" "}
-            <Link as={RouterLink} to="/signup" color="blue.500">
-              Sign Up
-            </Link>
-          </Text>
+          <Box
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"space-between"}
+          >
+            <Text mt={2}>
+              Not registered yet?{" "}
+              <Link as={RouterLink} to="/signup" color="blue.500">
+                Sign Up
+              </Link>
+            </Text>
+              <Text mt={2} color={"blue.500"}>
+            <RouterLink to="/forgot-password">
+                Forgot password?
+            </RouterLink>
+              </Text>
+          </Box>
         </Stack>
       </form>
     </Box>

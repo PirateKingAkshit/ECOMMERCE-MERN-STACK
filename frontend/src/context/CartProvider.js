@@ -6,15 +6,16 @@ import { UserState } from './UserProvider';
 
 const CartContext = createContext()
 const CartProvider = ({ children }) => {
-    
+    const [loading, setLoading] = useState(false);
     const { user } = UserState();
     const [cart, setCart] = useState([]);
     const toast = useToast();
     const SHIPPING_CHARGES = 50;
 
     const fetchCart = async () => {
-      try {
-        
+      if (user && user.token) {
+        try {
+          setLoading(true);
           const config = {
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -29,9 +30,10 @@ const CartProvider = ({ children }) => {
             localStorage.setItem("cart", JSON.stringify(data.items));
             setCart(data.items);
           }
-
-      } catch (error) {
-        console.log(error);
+          setLoading(false);
+        } catch (error) {
+          console.log(error);
+        }
       }
     };
 
@@ -165,7 +167,7 @@ const CartProvider = ({ children }) => {
 
 
   return (
-    <CartContext.Provider value={{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,setCart,SHIPPING_CHARGES,addToCart}}> 
+    <CartContext.Provider value={{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,setCart,SHIPPING_CHARGES,addToCart,loading}}> 
         {children}
     </CartContext.Provider>
   )

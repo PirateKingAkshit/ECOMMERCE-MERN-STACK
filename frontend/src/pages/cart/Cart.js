@@ -9,16 +9,14 @@ import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
 
-  const{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,setCart,SHIPPING_CHARGES}=CartState()
+  const{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,setCart,SHIPPING_CHARGES,loading}=CartState()
   const { user } = UserState();
   const toast = useToast();
-   const [loading, setLoading] = useState(false);
+   
   const navigate = useNavigate();
 
   useEffect(() => {
-   setLoading(true)
    fetchCart();
-   setLoading(false)
  }, [user]);
   
     const orderHandler = async() => {
@@ -79,6 +77,7 @@ const Cart = () => {
         <>
           {cart.length > 0 ? (
             <Box
+              mt={5}
               display="flex"
               justifyContent="space-around"
               alignItems="start"

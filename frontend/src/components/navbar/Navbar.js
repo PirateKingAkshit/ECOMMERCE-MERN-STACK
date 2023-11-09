@@ -11,6 +11,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 import { UserState } from '../../context/UserProvider';
 import axios from 'axios';
+import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -190,7 +191,9 @@ const Navbar = () => {
               <MenuItem fontSize={"20px"} _hover={{ color: "blue" }}>
                 <PersonOutlineIcon />
                 {user ? (
-                  <>My Profile</>
+                  <Link to="/profile">
+                    <>My Profile</>
+                  </Link>
                 ) : (
                   <Link to="/login">
                     <div>Log In</div>
@@ -224,14 +227,26 @@ const Navbar = () => {
               {user && user.isAdmin && (
                 <>
                   <Link to="/addProduct">
+                    <MenuItem fontSize={"20px"} _hover={{ color: "blue" }}>
+                      <AddCircleOutlineIcon />
+                      Add Product
+                    </MenuItem>
+                  </Link>
+                  <MenuDivider />
+                </>
+              )}
+
+              {user && (
+                <>
                   <MenuItem
                     fontSize={"20px"}
                     _hover={{ color: "blue" }}
                   >
-                      <AddCircleOutlineIcon />
-                      Add Product
-                  </MenuItem>
+                    <Link to="/change-password">
+                      <LockOpenOutlinedIcon />
+                      Change Password
                     </Link>
+                  </MenuItem>
                   <MenuDivider />
                 </>
               )}
@@ -264,14 +279,6 @@ const Navbar = () => {
             <ShoppingCartIcon /> Cart
           </Button>
         )}
-        {/* <Button
-            _hover={{ color: "blue" }}
-            fontSize={"25px"}
-            colorScheme="black"
-            onClick={handleCartClick}
-          >
-            <ShoppingCartIcon /> Cart
-          </Button> */}
       </Box>
     </>
   );

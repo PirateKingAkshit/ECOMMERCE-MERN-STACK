@@ -23,7 +23,7 @@ const Order = () => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.get("http://localhost:8080/api/orders", config)
+      const { data } = await axios.get(`http://localhost:8080/api/orders/user/${user._id}`, config)
       setOrder(data)
       setLoading(false)
     }
@@ -56,7 +56,7 @@ const Order = () => {
         });
        setIsLoading(false);
        setOrder(data)
-      navigate("/")
+       window.location.reload()
      } catch (error) {
       toast({
         title: "Error",
@@ -88,21 +88,22 @@ const Order = () => {
         <>
           {order.length > 0 ? (
               order.map((order) => {
-              console.log(order)
               return (
                 <Box
                   key={order._id}
-                  m={3}
-                  p="1"
+                  m={2}
+                  p="3"
                   display="flex"
                   borderWidth="2px"
                   height={"220px"}
                   borderRadius="md"
                 >
-                  <Box mr={"10px"}>
+                  <Box width="200px" display="flex" mr={"10px"}>
                     <Image
                       borderRadius="5px"
-                      w={"150px"}
+                      width="170px"
+                      alignItems="center"
+                      justifyContent="center"
                       src={order.product.image}
                       onClick={() => navigate(`/product/${order.product._id}`)}
                     />
