@@ -50,7 +50,7 @@ const UserProvider = ({children}) => {
 
   return (
     <UserContext.Provider
-      value={{ user, setUser,category}}
+      value={{ user, setUser,category,fetchCategory}}
     >
       {children}
     </UserContext.Provider>

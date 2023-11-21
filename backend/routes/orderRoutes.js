@@ -19,7 +19,7 @@ router.post("/", authenticateUser, createOrder)
 // @desc    Fetch orders for a particular user
 // @route   GET /api/orders
 // @access  Protected (Assuming authentication is required to fetch orders)
-router.get("/user/:userId", authenticateUser, getOrdersForUser)
+router.get("/user", authenticateUser, getOrdersForUser)
 
 // @desc    Fetch orders for Admin
 // @route   GET /api/orders/admin

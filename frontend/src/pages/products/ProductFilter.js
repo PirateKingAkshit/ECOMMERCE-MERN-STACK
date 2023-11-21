@@ -10,7 +10,7 @@ const ProductFilter = ({ applyFilter }) => {
   };
 
   return (
-    <Box border={1} >
+    <Box bgColor="white" p={2} borderRadius="5px" boxShadow="lg"  >
       <Input
         mb={1}
         type="number"

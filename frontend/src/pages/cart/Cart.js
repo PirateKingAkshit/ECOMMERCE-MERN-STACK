@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, Image, Button, Toast, useToast, Spinner } from '@chakra-ui/react';
+import { Box, Text, Image, Button, Toast, useToast, Spinner, Flex } from '@chakra-ui/react';
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { CartState } from '../../context/CartProvider';
@@ -61,18 +61,9 @@ const Cart = () => {
   return (
     <>
       {loading ? (
-        <>
-          <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="black"
-            size="xl"
-            m={"200px 615px"}
-            width={"100px"}
-            height={"100px"}
-          />
-        </>
+        <Flex align="center" justify="center" h="100vh">
+          <Spinner w="80px" h="80px" color="teal.500" />
+        </Flex>
       ) : (
         <>
           {cart.length > 0 ? (

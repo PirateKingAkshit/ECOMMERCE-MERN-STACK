@@ -11,6 +11,7 @@ import {
   IconButton,
   InputGroup,
   useToast,
+  Flex,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -86,7 +87,7 @@ const Login = () => {
   };
 
   return (
-    <Box maxW="md" mx="auto" mt={8} p={6} borderWidth={1} borderRadius="lg">
+    <Box maxW="md" mx="auto" bgColor="white"  my={8} p={6} borderWidth={1} borderRadius="lg" boxShadow="2xl">
       <Text fontSize="2xl" fontWeight={"bold"} mb={4} textAlign={"center"}>
         Login
       </Text>
@@ -127,18 +128,34 @@ const Login = () => {
           <Button type="submit" colorScheme="blue" isLoading={loading}>
             Login
           </Button>
-          <Button
-            colorScheme="red"
-            onClick={() => {
-              setFormData({
-                ...formData,
-                email: "deepak@gmail.com",
-                password: "deepak@123",
-              });
-            }}
-          >
-            Guest User Credential
-          </Button>
+          <Flex justifyContent={"space-between"}>
+            <Button
+              
+              colorScheme="red"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  email: "deepak@gmail.com",
+                  password: "deepak@123",
+                });
+              }}
+            >
+              Guest User Credential
+            </Button>
+            <Button
+              w={"50%"}
+              colorScheme="yellow"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  email: "akshitkumar383@gmail.com",
+                  password: "akshit@123",
+                });
+              }}
+            >
+              Guest Admin Credential
+            </Button>
+          </Flex>
 
           <Box
             display={"flex"}
@@ -151,11 +168,9 @@ const Login = () => {
                 Sign Up
               </Link>
             </Text>
-              <Text mt={2} color={"blue.500"}>
-            <RouterLink to="/forgot-password">
-                Forgot password?
-            </RouterLink>
-              </Text>
+            <Text mt={2} color={"blue.500"}>
+              <RouterLink to="/forgot-password">Forgot password?</RouterLink>
+            </Text>
           </Box>
         </Stack>
       </form>

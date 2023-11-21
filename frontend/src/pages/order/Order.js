@@ -1,161 +1,228 @@
-import { Box, Button, Text, Spinner, Image, useToast } from '@chakra-ui/react';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { UserState } from '../../context/UserProvider';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Text,
+  Spinner,
+  Image,
+  useToast,
+  Flex,
+  VStack,
+  HStack,
+  Checkbox,
+} from "@chakra-ui/react";
+import axios from "axios";
+import { UserState } from "../../context/UserProvider";
+import { useNavigate } from "react-router-dom";
 
 const Order = () => {
-  const [order, setOrder] = useState([])
+  const [order, setOrder] = useState([]);
   const { user } = UserState();
   const [loading, setLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
-  
+  const filterStatusOptions = ["Pending", "Shipped", "Delivered", "Cancelled"];
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+
   useEffect(() => {
     fetchOrder();
   }, [user]);
+
   const fetchOrder = async () => {
+    if (user && user.token) {
+      try {
+        setLoading(true);
+        const { data } = await axios.get(
+          `http://localhost:8080/api/orders/user`,
+          { headers: { Authorization: `Bearer ${user.token}` } }
+        );
+        setOrder(data);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const handleCancelClick = async (orderId) => {
     try {
-      setLoading(true)
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.get(`http://localhost:8080/api/orders/user/${user._id}`, config)
-      setOrder(data)
-      setLoading(false)
-    }
-    catch (error) {
-      console.log(error)
-    }
-  }
-
-   const handleCancelClick = async(orderId) => {
-     
-     try {
-       setIsLoading(true)
-       const config = {
-         headers: {
-           Authorization: `Bearer ${user.token}`,
-         },
-       };
-       const { data } = await axios.put(
-         "http://localhost:8080/api/orders/cancel",
-         {orderId:orderId},
-         config
-       );
-
-        toast({
-          title: "Order Cancelled",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-          position: "top",
-        });
-       setIsLoading(false);
-       setOrder(data)
-       window.location.reload()
-     } catch (error) {
+      setIsLoading(true);
+      const { data } = await axios.put(
+        "http://localhost:8080/api/orders/cancel",
+        { orderId },
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
       toast({
-        title: "Error",
-        status: "error",
-        description:error.message,
+        title: "Order Cancelled",
+        status: "success",
         duration: 2000,
         isClosable: true,
         position: "top",
       });
-       setIsLoading(false)
-     }
-   };
+      setIsLoading(false);
+      fetchOrder()
+    } catch (error) {
+      toast({
+        title: "Error",
+        status: "error",
+        description: error.message,
+        duration: 2000,
+        isClosable: true,
+        position: "top",
+      });
+      setIsLoading(false);
+    }
+  };
+
+  const handleCheckboxChange = (status) => {
+    setSelectedStatuses((prevStatuses) => {
+      if (prevStatuses.includes(status)) {
+        return prevStatuses.filter((s) => s !== status);
+      } else {
+        return [...prevStatuses, status];
+      }
+    });
+  };
+
+  const filteredOrders = order.filter((orderItem) => {
+    if (selectedStatuses.length === 0) {
+      return true;
+    }
+    return selectedStatuses.includes(orderItem.status);
+  });
+
   return (
-    <>
-      {loading ? (
-        <>
-          <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="black"
-            size="xl"
-            m={"200px 615px"}
-            width={"100px"}
-            height={"100px"}
-          />
-        </>
-      ) : (
-        <>
-          {order.length > 0 ? (
-              order.map((order) => {
-              return (
+    <Flex p={5} justify="space-between">
+      <Box
+        display={"flex"}
+        flexDir={"column"}
+        w="200px"
+        h="200px"
+        p="4"
+        m={5}
+        boxShadow="lg"
+        borderRadius="5px"
+        borderWidth={1}
+      >
+        <Text mb="2" fontWeight="bold">
+          Filter by Status:
+        </Text>
+        {filterStatusOptions.map((status) => (
+          <Checkbox
+            key={status}
+            onChange={() => handleCheckboxChange(status)}
+            isChecked={selectedStatuses.includes(status)}
+            mb="2"
+          >
+            {status}
+          </Checkbox>
+        ))}
+      </Box>
+
+      <Flex w="80%" direction="column">
+        {loading ? (
+          <Flex align="center" justify="center" h="100vh">
+            <Spinner w="80px" h="80px" color="teal.500" />
+          </Flex>
+        ) : (
+          <VStack spacing={4}>
+            {filteredOrders.length > 0 ? (
+              filteredOrders.map((order) => (
                 <Box
                   key={order._id}
-                  m={2}
-                  p="3"
-                  display="flex"
-                  borderWidth="2px"
-                  height={"220px"}
+                  p={4}
+                  w="100%"
+                  borderWidth="1px"
                   borderRadius="md"
+                  boxShadow="md"
                 >
-                  <Box width="200px" display="flex" mr={"10px"}>
-                    <Image
-                      borderRadius="5px"
-                      width="170px"
-                      alignItems="center"
-                      justifyContent="center"
-                      src={order.product.image}
-                      onClick={() => navigate(`/product/${order.product._id}`)}
-                    />
-                  </Box>
-                  <Box
-                    display={"flex"}
-                    flexDir={"column"}
-                    justifyContent={"space-around"}
-                  >
-                    <Text fontWeight="bold">Order ID: {order._id}</Text>
-                    {/* <Text>User ID: {order.user._id}</Text> */}
-                    {/* <Text>Product ID: {order.product._id}</Text> */}
-                    <Text>Item: {order.product.name}</Text>
-                    <Text>Quantity: {order.quantity}</Text>
-                    <Text>Total: ${order.total}</Text>
-                    <Text>Status: {order.status}</Text>
-                    <Text>
-                      Ordered At: {new Date(order.createdAt).toLocaleString()}
-                    </Text>
-                    {order.status === "Pending" ||
-                    order.status === "Shipped" ? (
-                      <Button
-                        isLoading={isLoading}
-                        colorScheme="red"
-                        mt="4"
-                        onClick={() => handleCancelClick(order._id)}
-                      >
-                        Cancel Order
-                      </Button>
-                    ) : (
-                      <></>
+                  <HStack spacing={10} align="center">
+                    <Box w="200px">
+                      <Image
+                        borderRadius="5px"
+                        w="100%"
+                        maxW="200px"
+                        src={order.product.image}
+                        alt={order.product.name}
+                        onClick={() =>
+                          navigate(`/product/${order.product._id}`)
+                        }
+                      />
+                    </Box>
+                    <VStack align="start" spacing={2}>
+                      <Text fontWeight="bold" fontSize="xl">
+                        Oorder Id: {order._id}
+                      </Text>
+                      <Text fontWeight="bold" fontSize="xl">
+                        {order.product.name}
+                      </Text>
+                      <Text>Quantity: {order.quantity}</Text>
+                      <Text>Total: ${order.total}</Text>
+                      <Text>Status: {order.status}</Text>
+                      <Text>
+                        Ordered At: {new Date(order.createdAt).toLocaleString()}
+                      </Text>
+                      {order.status === "Pending" ||
+                      order.status === "Shipped" ? (
+                        <Button
+                          isLoading={isLoading}
+                          colorScheme="red"
+                          mt={4}
+                          onClick={() => handleCancelClick(order._id)}
+                        >
+                          Cancel Order
+                        </Button>
+                      ) : null}
+                    </VStack>
+                    <VStack align="start">
+                      <Text fontWeight="bold" fontSize="lg">
+                        Delivery Address
+                      </Text>
+                      <Text fontWeight="bold">{order.user.name}</Text>
+                      <Text>{order.address.houseNo}</Text>
+                      <Text>{order.address.city}</Text>
+                      <Text>{order.address.state}</Text>
+                      <Text>
+                        {order.address.zip} {order.address.country}
+                      </Text>
+                      <Text fontWeight="normal">
+                        <span style={{ fontWeight: "bold" }}>
+                          Phone Number:{" "}
+                        </span>
+                        {order.user.phoneNumber}
+                      </Text>
+                    </VStack>
+                    {order.status === "Delivered" && (
+                      <Box>
+                        <Button
+                          colorScheme="teal"
+                          mt={4}
+                          onClick={() =>
+                            navigate(`/review/${order.product._id}`)
+                          }
+                        >
+                          Rate & Review Product
+                        </Button>
+                      </Box>
                     )}
-                  </Box>
+                  </HStack>
                 </Box>
-              );
-            })
-          ) : (
-            <Box textAlign="center">
-              <Text>No orders available.</Text>
-              <Button
-                colorScheme="blue"
-                mt="4"
-                onClick={() => navigate("/")}
-              >
-                Go to Main Page
-              </Button>
-            </Box>
-          )}
-        </>
-      )}
-    </>
+              ))
+            ) : (
+              <VStack mt={8}>
+                <Text fontSize="xl">No orders available.</Text>
+                <Button colorScheme="teal" mt={4} onClick={() => navigate("/")}>
+                  Go to Main Page
+                </Button>
+              </VStack>
+            )}
+          </VStack>
+        )}
+      </Flex>
+    </Flex>
   );
-}
+};
 
-export default Order
+export default Order;
+

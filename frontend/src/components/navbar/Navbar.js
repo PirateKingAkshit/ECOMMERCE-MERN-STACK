@@ -1,5 +1,20 @@
-import React, { useState } from 'react'
-import { Box, Input, InputGroup, InputLeftElement, Text,useDisclosure, MenuItem,Menu, MenuButton, MenuList, MenuDivider, Button, InputRightElement, useToast, } from "@chakra-ui/react";
+import React, { useState } from "react";
+import {
+  Box,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
+  useDisclosure,
+  MenuItem,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuDivider,
+  Button,
+  InputRightElement,
+  useToast,
+} from "@chakra-ui/react";
 import SearchIcon from "@mui/icons-material/Search";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -8,9 +23,9 @@ import InboxIcon from "@mui/icons-material/Inbox";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { Link, createSearchParams, useNavigate } from 'react-router-dom'
-import { UserState } from '../../context/UserProvider';
-import axios from 'axios';
+import { Link, createSearchParams, useNavigate } from "react-router-dom";
+import { UserState } from "../../context/UserProvider";
+import axios from "axios";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 
 const Navbar = () => {
@@ -18,11 +33,9 @@ const Navbar = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState();
   const toast = useToast();
-  const navigate = useNavigate()
-  const { user,setUser,category } = UserState();
+  const navigate = useNavigate();
+  const { user, setUser, category } = UserState();
 
-  
-  
   const searchItem = () => {
     if (searchQuery) {
       navigate(`/?${createSearchParams({ search: searchQuery })}`);
@@ -30,7 +43,7 @@ const Navbar = () => {
     setSearchQuery("");
   };
 
-  const logoutHandler = async() => {
+  const logoutHandler = async () => {
     const localCart = JSON.parse(localStorage.getItem("cart"));
     if (localCart && localCart.length > 0) {
       await axios.put(
@@ -58,8 +71,8 @@ const Navbar = () => {
       position: "bottom",
     });
     setUser(null);
-    navigate("/")
-  }
+    navigate("/");
+  };
 
   const handleCartClick = () => {
     if (!user) {
@@ -76,10 +89,6 @@ const Navbar = () => {
     navigate("/cart");
   };
 
-
-  
-  
-  
   return (
     <>
       <Box
@@ -88,6 +97,7 @@ const Navbar = () => {
         p={4}
         justifyContent={"space-around"}
         alignItems={"center"}
+        
       >
         <Box
           cursor="pointer"
@@ -141,7 +151,11 @@ const Navbar = () => {
                 >
                   {selectedCategory}
                 </MenuButton>
-                <MenuList>
+                <MenuList
+                  minWidth={"170px"}
+                  maxHeight="250px"
+                  overflowY={"scroll"}
+                >
                   <MenuItem
                     onClick={() => {
                       setSelectedCategory("All");
@@ -184,7 +198,7 @@ const Navbar = () => {
               w={200}
             >
               <PersonOutlineIcon />
-              {user ? <>Account</> : <>Log In</>}
+              {user ? <>My Account</> : <>Log In</>}
               {isOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
             </MenuButton>
             <MenuList onMouseEnter={onOpen} onMouseLeave={onClose}>
@@ -238,10 +252,7 @@ const Navbar = () => {
 
               {user && (
                 <>
-                  <MenuItem
-                    fontSize={"20px"}
-                    _hover={{ color: "blue" }}
-                  >
+                  <MenuItem fontSize={"20px"} _hover={{ color: "blue" }}>
                     <Link to="/change-password">
                       <LockOpenOutlinedIcon />
                       Change Password
@@ -282,6 +293,6 @@ const Navbar = () => {
       </Box>
     </>
   );
-}
+};
 
-export default Navbar
+export default Navbar;

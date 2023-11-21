@@ -12,6 +12,7 @@ import AddProduct from './pages/admin/AddProduct';
 import MyProfile from './pages/My Profile/MyProfile';
 import ForgotPasswordForm from './pages/forgot-password/ForgotPasswordForm';
 import ResetPasswordForm from './pages/forgot-password/ResetPasswordForm';
+import Review from './pages/review/Review';
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         <Route path="/change-password" element={<ForgotPasswordForm />} />
         <Route path="/reset-password/:id/:token" element={<ResetPasswordForm />} />
+        <Route path="/review/:productId" element={<Review />} />
       </Routes>
     </div>
   );

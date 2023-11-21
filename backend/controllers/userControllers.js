@@ -167,22 +167,17 @@ const forgotPasswordController = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
-    await User.findByIdAndUpdate(
-      { _id: user._id },
-      { passwordResetToken: token },
-      { new: true }
-    );
 
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "akshitkumar383@gmail.com",
+        user: `${process.env.EMAIL}`,
         pass: `${process.env.APPLICATION_SPECIFIC_PASSWORD}`,
       },
     });
 
     var mailOptions = {
-      from: "akshitkumar383@gmail.com",
+      from: `${process.env.EMAIL}`,
       to: `${user.email}`,
       subject: "Reset Your Password",
       text: `http://localhost:3000/reset-password/${user._id}/${token}`,
@@ -206,7 +201,7 @@ const forgotPasswordController = async (req, res) => {
 const resetPasswordController = async (req, res) => {
   const { id, token } = req.params;
   const { password } = req.body;
-  console.log(id,token,password)
+  
   let verify;
 try {
   verify = jwt.verify(token, process.env.JWT_SECRET);

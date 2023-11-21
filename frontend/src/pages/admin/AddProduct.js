@@ -38,7 +38,7 @@ const AddProduct = () => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 
-  const { user, category } = UserState();
+  const { user, category, fetchCategory } = UserState();
   const navigate = useNavigate()
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -149,6 +149,7 @@ const AddProduct = () => {
         position: "top",
       });
       setLoading(false);
+      fetchCategory()
       navigate("/addProduct");
     } catch (error) {
       toast({

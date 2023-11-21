@@ -59,14 +59,18 @@ const createProduct = asyncHandler(async (req, res) => {
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-  const { search, category, minPrice, maxPrice } = req.query;
+  const { search, category, minPrice, maxPrice,page } = req.query;
 
   let products;
 
   let query = {};
 
+  const limit = 12;
+  const pageNo =  page;
+  const skip = limit * (pageNo - 1);
+
   if (search) {
-    query.name = { $regex: search, $options: "i" }; // Case-insensitive search by name
+    query.name = { $regex: search, $options: "i" };
   }
 
   if (category) {
@@ -81,9 +85,29 @@ const getProducts = asyncHandler(async (req, res) => {
     query.price = { $lte: maxPrice };
   }
 
-  products = await Product.find(query).populate("category");
-  const count = products.length;
+  products = await Product.find(query).populate("category").skip(skip).limit(limit)
+  const count = (await Product.find(query).populate("category")).length;
   res.json({ count, products });
+});
+
+
+// @desc    Search products by category
+// @route   GET /api/products/category/:categoryId
+// @access  Public
+const getProductsByCategory = asyncHandler(async (req, res) => {
+  const categoryId = req.query;
+  console.log(categoryId)
+
+  const products = await Product.find({
+    category: categoryId,
+  }).populate("category");
+    const count = products.length
+
+  if (products) {
+    res.json({count,products});
+  } else {
+    res.status(404).json({ error: 'Products not found for this category' });
+  }
 });
 
 
@@ -97,12 +121,15 @@ const getProducts = asyncHandler(async (req, res) => {
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id).populate("category");
 
+  
+
   if (product) {
     res.json(product);
   } else {
     res.status(404).json({ error: "Product not found" });
   }
 });
+
 
 // @desc   Update a product by id
 // @route  PUT /api/products/id
@@ -147,24 +174,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 
-// @desc    Search products by category
-// @route   GET /api/products?category=categoryId
-// @access  Public
-const getProductsByCategory = asyncHandler(async (req, res) => {
-  const categoryId = req.query;
-  console.log(categoryId)
 
-  const products = await Product.find({
-    category: categoryId,
-  }).populate("category");
-    const count = products.length
-
-  if (products) {
-    res.json({count,products});
-  } else {
-    res.status(404).json({ error: 'Products not found for this category' });
-  }
-});
 
 module.exports = {
   createProduct,

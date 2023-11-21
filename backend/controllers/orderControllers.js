@@ -1,7 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Joi = require("joi");
 const Order = require("../models/orderModel");
-const Cart = require("../models/cartModel");
 const Product=require("../models/productModel")
 
 
@@ -36,10 +35,10 @@ const createOrder = asyncHandler(async (req, res) => {
 });
 
 // @desc    Fetch orders for a particular user
-// @route   GET /api/orders/user/:userId
+// @route   GET /api/orders/user
 // @access  Protected (Assuming authentication is required to fetch orders)
 const getOrdersForUser = asyncHandler(async (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.user._id;
 
   try {
     const orders = await Order.find({ user: userId }).sort({ createdAt: -1 }).populate("user").populate("product")
@@ -91,7 +90,7 @@ const cancelOrderForUser = asyncHandler(async (req, res) => {
 // @access  Protected (Assuming authentication is required to fetch orders)
 const changeOrderStatusByAdmin = asyncHandler(async (req, res) => {
   const { orderId, currentStatus } = req.body;
-  console.log(currentStatus)
+
   const order = await Order.findByIdAndUpdate(
     { _id: orderId },
     { status: currentStatus },

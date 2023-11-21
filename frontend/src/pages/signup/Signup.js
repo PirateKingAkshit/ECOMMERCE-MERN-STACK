@@ -105,7 +105,7 @@ const Signup = () => {
       p={6}
       borderWidth={1}
       borderRadius="lg"
-      bg="teal.200"
+      boxShadow="2xl"
     >
       <Text
         fontSize="2xl"
