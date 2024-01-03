@@ -180,7 +180,7 @@ const forgotPasswordController = async (req, res) => {
       from: `${process.env.EMAIL}`,
       to: `${user.email}`,
       subject: "Reset Your Password",
-      text: `http://localhost:3000/reset-password/${user._id}/${token}`,
+      text: `http://localhost:5173/reset-password/${user._id}/${token}`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {

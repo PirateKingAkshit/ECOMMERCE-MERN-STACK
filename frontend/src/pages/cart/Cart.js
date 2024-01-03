@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, Image, Button, Toast, useToast, Spinner, Flex } from '@chakra-ui/react';
+import { Box, Text, Image, Button, Toast, useToast, Spinner, Flex, HStack, Divider, IconButton, VStack } from '@chakra-ui/react';
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { CartState } from '../../context/CartProvider';
@@ -9,15 +9,15 @@ import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
 
-  const{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,setCart,SHIPPING_CHARGES,loading}=CartState()
+  const{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,setCart,SHIPPING_CHARGES,loading,cartLength}=CartState()
   const { user } = UserState();
   const toast = useToast();
    
   const navigate = useNavigate();
 
-  useEffect(() => {
-   fetchCart();
- }, [user]);
+//   useEffect(() => {
+//    fetchCart();
+//  }, [user]);
   
     const orderHandler = async() => {
         const config = {
@@ -65,125 +65,139 @@ const Cart = () => {
           <Spinner w="80px" h="80px" color="teal.500" />
         </Flex>
       ) : (
-        <>
+        <Box px={10} py={2}>
           {cart.length > 0 ? (
             <Box
-              mt={5}
               display="flex"
-              justifyContent="space-around"
-              alignItems="start"
-              width="100%"
-              padding="5px"
+              w="100%"
+              padding={0}
+              boxShadow="0 4px 20px rgba(0, 0, 0, 0.1)"
             >
-              {/* Cart Summary */}
-              <Box
-                width="65%"
-                height="fit-content"
-                padding="15px"
-                boxShadow="md"
-                backgroundColor="aqua"
-                borderRadius="5px"
-              >
-                <Text fontSize="xl" mb="15px">
-                  Cart Summary
-                </Text>
-                {cart.map((item) => (
-                  <Box
-                    key={item.product._id}
-                    display="flex"
-                    justifyContent="space-around"
-                    width="100%"
-                    marginBottom="20px"
-                    boxShadow="md"
-                    backgroundColor="white"
-                    borderRadius="5px"
+              <Box width="70%" px={5}>
+                <HStack w="100%" py={4} justifyContent="space-between">
+                  <Text fontSize="larger" fontWeight="bold">
+                    Shopping Carts
+                  </Text>
+                  <Text fontWeight="bold">{cartLength} Items</Text>
+                </HStack>
+                <Divider bg="black" h="1px" w="100%" />
+                <HStack mb={5}>
+                  <Text color="grey" w="45%" fontWeight="semibold">
+                    Product Details
+                  </Text>
+                  <Text
+                    textAlign="center"
+                    color="grey"
+                    w="21%"
+                    fontWeight="semibold"
                   >
-                    <Image
-                      src={item.product.image}
-                      alt=""
-                      boxSize="150px"
-                      borderRadius="10px"
-                      padding="10px 0px"
-                      onClick={() => navigate(`/product/${item.product._id}`)}
-                    />
-                    <Box width="50%" height="fit-content">
-                      <Text fontSize="20px" fontWeight="bold">
-                        {item.product.name}
-                      </Text>
-                      <Text color="blueviolet" fontSize="20px">
-                        ${item.product.price}
-                      </Text>
-                    </Box>
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      justifyContent="space-evenly"
-                    >
-                      <Box display="flex" alignItems="center">
-                        <Button
-                          size="sm"
-                          onClick={() => decreaseQuantity(item.product._id)}
-                          disabled={item.quantity === 1}
-                        >
-                          <RemoveIcon />
-                        </Button>
-                        <Text fontSize="30px" color="blue">
-                          {item.quantity}
-                        </Text>
-                        <Button
-                          size="sm"
-                          onClick={() => increaseQuantity(item.product._id)}
-                          disabled={item.quantity === 5}
-                        >
-                          <AddIcon />
-                        </Button>
+                    Quantity
+                  </Text>
+                  <Text
+                    textAlign="center"
+                    color="grey"
+                    w="17%"
+                    fontWeight="semibold"
+                  >
+                    Price
+                  </Text>
+                  <Text
+                    textAlign="center"
+                    color="grey"
+                    w="17%"
+                    fontWeight="semibold"
+                  >
+                    Total
+                  </Text>
+                </HStack>
+                <div className='orders_scroll' style={{width:"100%", height:"400px", overflowY:"auto"}} >
+                  {cart.map((item) => (
+                    <HStack key={item.product._id} p={1} mb={5}>
+                      <Box w="45%">
+                        <Box display="flex" w="100%">
+                          <Image
+                            w="40%"
+                            h="150px"
+                            src={item.product.image}
+                            borderRadius={5}
+                            mr={2}
+                          />
+                          <VStack justifyContent="space-around" w="40%">
+                            <Text fontWeight="bold" mr="auto">{item.product.name}</Text>
+                            <Text fontSize="sm" color="gray" mr="auto">
+                               Category: {item.product.category.name}
+                            </Text>
+                            <Text cursor="pointer" color="gray" mr="auto" onClick={() => removeFromCart(item.product._id)}>
+                              Remove
+                            </Text>
+                          </VStack>
+                        </Box>
                       </Box>
-                      <Button
-                        onClick={() => removeFromCart(item.product._id)}
-                        colorScheme="messenger"
-                        width={"100%"}
-                      >
-                        Remove
-                      </Button>
-                    </Box>
-                  </Box>
-                ))}
+                      <Box w="21%">
+                        <HStack w="100%" justifyContent="space-around">
+                          <IconButton
+                            size="sm"
+                            icon={<RemoveIcon />}
+                            onClick={() => decreaseQuantity(item.product._id)}
+                            disabled={item.quantity === 1}
+                          />
+                          <Box borderWidth={2} borderColor="wheat">
+                            <Text textAlign="center" w="30px">
+                              {item.quantity}
+                            </Text>
+                          </Box>
+                          <IconButton
+                            size="sm"
+                            icon={<AddIcon />}
+                            onClick={() => increaseQuantity(item.product._id)}
+                            disabled={item.quantity === 5}
+                          />
+                        </HStack>
+                      </Box>
+                      <Box w="17%">
+                        <Text textAlign="center" fontSize="20px">
+                          ${item.product.price}
+                        </Text>
+                      </Box>
+                      <Box w="17%">
+                        <Text textAlign="center" fontSize="20px">
+                          ${item.product.price * item.quantity}
+                        </Text>
+                      </Box>
+                    </HStack>
+                  ))}
+                </div>
               </Box>
 
-              {/* Payment Summary */}
-              <Box
-                width="25%"
-                position="sticky"
-                top="20px"
-                padding="10px"
-                boxShadow="lg"
-                backgroundColor="white"
-                borderRadius="5px"
-              >
-                <Text fontSize="xl">Payment Summary</Text>
-                {/* Subtotal */}
-                <Text>
-                  Subtotal:{" "}
-                  <span style={{ color: "blue" }}>${cartTotal()}</span>
+              <Box width="30%" py={4} px={6} bg="whitesmoke">
+                <Text fontSize="larger" mb={4} fontWeight="bold">
+                  Order Summary 
                 </Text>
-                {/* Shipping Fee */}
-                <Text>
-                  Shipping Fee:{" "}
-                  <span style={{ color: "blue" }}>${SHIPPING_CHARGES}</span>
-                </Text>
-                <Box borderBottom="1px solid #ccc" my="2" />
-                {/* Total */}
-                <Text>
-                  Total:{" "}
-                  <span style={{ color: "blue" }}>
+                <Divider bg="black" h="1px" mb={10} />
+                <HStack w="100%" justifyContent="space-between" mb={10}>
+                  <Text fontWeight="bold">ITEMS {cartLength}</Text>
+                  <Text color="lightslategray" fontWeight="semibold">
+                    ${cartTotal()}
+                  </Text>
+                </HStack>
+                <HStack w="100%" mb={10} justifyContent="space-between">
+                  <Text fontWeight="bold">SHIPPING</Text>
+                  <Text color="lightslategray" fontWeight="semibold">
+                    ${SHIPPING_CHARGES}
+                  </Text>
+                </HStack>
+                <Divider h="2px" bg="black" mb={10} />
+                <HStack w="100%" mb={10} justifyContent="space-between">
+                  <Text fontWeight="bold">TOTAL COST</Text>
+                  <Text color="lightslategray" fontWeight="semibold">
                     ${cartTotal() + SHIPPING_CHARGES}
-                  </span>
-                </Text>
-                <Box borderBottom="1px solid #ccc" my="2" />
+                  </Text>
+                </HStack>
                 <Button
                   colorScheme="messenger"
                   width={"100%"}
                   onClick={() => orderHandler()}
+                  position="inherit"
                 >
                   Order
                 </Button>
@@ -192,12 +206,12 @@ const Cart = () => {
           ) : (
             <Box textAlign="center">
               <Text>Your Cart Is Empty</Text>
-              <Button colorScheme="blue" mt="4" onClick={() => navigate("/")}>
-                Go to Main Page
+              <Button colorScheme="blue" mt="4" onClick={() => navigate("/products")}>
+                Buy Products
               </Button>
             </Box>
           )}
-        </>
+        </Box>
       )}
     </>
   );

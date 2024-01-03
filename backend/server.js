@@ -27,7 +27,7 @@ app.use(
     credentials: true, // Allow cookies to be sent with requests
   })
 );
-// app.use(morgan('dev'))
+app.use(morgan('dev'))
 
 
 //routes

@@ -1,3 +1,5 @@
+
+
 import React, { useState } from "react";
 import {
   Box,
@@ -14,19 +16,23 @@ import {
   Button,
   InputRightElement,
   useToast,
+  HStack,
 } from "@chakra-ui/react";
 import SearchIcon from "@mui/icons-material/Search";
+import CategoryIcon from "@mui/icons-material/Category";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import InboxIcon from "@mui/icons-material/Inbox";
-import LogoutIcon from "@mui/icons-material/Logout";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import { Link, createSearchParams, useNavigate } from "react-router-dom";
 import { UserState } from "../../context/UserProvider";
 import axios from "axios";
+import LogoutIcon from "@mui/icons-material/Logout";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
+import InboxIcon from "@mui/icons-material/Inbox";
+import { CartState } from "../../context/CartProvider";
+import Products from '../../pages/products/Products';
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -35,10 +41,11 @@ const Navbar = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const { user, setUser, category } = UserState();
+  const { cartLength } = CartState();
 
   const searchItem = () => {
     if (searchQuery) {
-      navigate(`/?${createSearchParams({ search: searchQuery })}`);
+      navigate(`/products?${createSearchParams({ search: searchQuery })}`);
     }
     setSearchQuery("");
   };
@@ -72,6 +79,7 @@ const Navbar = () => {
     });
     setUser(null);
     navigate("/");
+    window.location.reload();
   };
 
   const handleCartClick = () => {
@@ -92,12 +100,16 @@ const Navbar = () => {
   return (
     <>
       <Box
+        // position="sticky"
+        // top={0}
         display={"flex"}
-        bg={"black"}
+        // bg={"#2c3e50"}
+        bg={"blue"}
         p={4}
         justifyContent={"space-around"}
         alignItems={"center"}
-        
+        borderBottom="1px"
+        borderColor="white"
       >
         <Box
           cursor="pointer"
@@ -106,24 +118,24 @@ const Navbar = () => {
             setSelectedCategory("All");
           }}
         >
-          <Text fontSize={"4xl"} color={"white"}>
-            Urban<span style={{ color: "blue" }}>Utopia</span>
+          <Text fontSize={"4xl"} color={"#ecf0f1"}>
+            Urban<span style={{ color: "yellow" }}>Utopia</span>
           </Text>
         </Box>
 
-        <Box w={"50%"}>
+        <Box w={"40%"}>
           <InputGroup>
             <InputLeftElement>
-              <SearchIcon onClick={searchItem} style={{ color: "white" }} />
+              <SearchIcon onClick={searchItem} style={{ color: "#ecf0f1" }} />
             </InputLeftElement>
             <Input
-              size={"md"}
+              size="md"
               variant={"outline"}
               type="text"
               placeholder="Search for Products"
-              _placeholder={{ color: "white" }}
+              _placeholder={{ color: "#ecf0f1" }}
               fontSize={"xl"}
-              color={"lightblue"}
+              color={"#ecf0f1"}
               pb={1}
               value={searchQuery}
               onChange={(e) => {
@@ -135,7 +147,7 @@ const Navbar = () => {
                 }
               }}
             />
-            <InputRightElement width="5rem">
+            {/* <InputRightElement width="5rem">
               <Menu>
                 <MenuButton
                   fontWeight={"semibold"}
@@ -145,8 +157,8 @@ const Navbar = () => {
                   borderRadius={4}
                   w={"100%"}
                   h={"100%"}
-                  bg={"white"}
-                  color={"black"}
+                  bg={"#ecf0f1"}
+                  color={"#2c3e50"}
                   overflowY={"hidden"}
                 >
                   {selectedCategory}
@@ -179,18 +191,33 @@ const Navbar = () => {
                   ))}
                 </MenuList>
               </Menu>
-            </InputRightElement>
+            </InputRightElement> */}
           </InputGroup>
         </Box>
+
+        <Link to="/products">
+          <Box bg="transparent">
+            <Text
+              fontSize={"25px"}
+              fontWeight="normal"
+              _hover={{ color: "yellow" }}
+              color="white"
+            >
+              <CategoryIcon />
+              Products
+            </Text>
+          </Box>
+        </Link>
 
         <Box>
           <Menu isOpen={isOpen}>
             <MenuButton
-              color={"white"}
+              color={"#ecf0f1"}
               variant="ghost"
               borderRadius={5}
-              bg={"black"}
-              _hover={{ color: "blue" }}
+              // bg={"#2c3e50"}
+              // _hover={{ color: "#3498db" }}
+              _hover={{ color: "yellow" }}
               fontSize={"25px"}
               fontWeight="normal"
               onMouseEnter={onOpen}
@@ -198,7 +225,7 @@ const Navbar = () => {
               w={200}
             >
               <PersonOutlineIcon />
-              {user ? <>My Account</> : <>Log In</>}
+              {user ? <>Account</> : <>Log In</>}
               {isOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
             </MenuButton>
             <MenuList onMouseEnter={onOpen} onMouseLeave={onClose}>
@@ -206,7 +233,7 @@ const Navbar = () => {
                 <PersonOutlineIcon />
                 {user ? (
                   <Link to="/profile">
-                    <>My Profile</>
+                    <>Profile</>
                   </Link>
                 ) : (
                   <Link to="/login">
@@ -281,14 +308,67 @@ const Navbar = () => {
         {user && user.isAdmin ? (
           <></>
         ) : (
-          <Button
-            _hover={{ color: "blue" }}
-            fontSize={"25px"}
-            colorScheme="black"
-            onClick={handleCartClick}
-          >
-            <ShoppingCartIcon /> Cart
-          </Button>
+          <HStack alignItems="center">
+            <Button
+              _hover={{ color: "yellow" }}
+              // _hover={{ color: "#3498db" }}
+              fontSize={"25px"}
+              colorScheme="black"
+              onClick={handleCartClick}
+              position="relative"
+            >
+              <ShoppingCartIcon /> Cart
+              {cartLength > 0 ? (
+                cartLength >= 9 ? (
+                  <Text
+                    position="inherit"
+                    bottom="20px"
+                    right="75px"
+                    ml={2}
+                    borderWidth={2}
+                    borderColor="#e74c3c"
+                    color="#2c3e50"
+                    borderRadius="50%"
+                    bg="#f1c40f"
+                    p={1}
+                    w="27px"
+                    h="27px"
+                    fontSize="15px"
+                    fontWeight="bold"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    9+
+                  </Text>
+                ) : (
+                  <Text
+                    position="inherit"
+                    bottom="20px"
+                    right="75px"
+                    ml={2}
+                    borderWidth={2}
+                    borderColor="#e74c3c"
+                    color="#2c3e50"
+                    borderRadius="50%"
+                    bg="#f1c40f"
+                    p={1}
+                    w="27px"
+                    h="27px"
+                    fontSize="15px"
+                    fontWeight="bold"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    {cartLength}
+                  </Text>
+                )
+              ) : (
+                <></>
+              )}
+            </Button>
+          </HStack>
         )}
       </Box>
     </>
@@ -296,3 +376,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

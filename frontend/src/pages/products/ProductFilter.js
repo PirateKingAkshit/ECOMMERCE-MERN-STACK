@@ -10,13 +10,20 @@ const ProductFilter = ({ applyFilter }) => {
   };
 
   return (
-    <Box bgColor="white" p={2} borderRadius="5px" boxShadow="lg"  >
+    <Box
+      bgColor="white"
+      p={2}
+      borderRadius="5px"
+      boxShadow="lg"
+      position="inherit"
+    >
       <Input
         mb={1}
         type="number"
         placeholder="Min Price"
         value={minPrice}
         onChange={(e) => setMinPrice(e.target.value)}
+        position="inherit"
       />
       <Input
         type="number"
@@ -24,8 +31,11 @@ const ProductFilter = ({ applyFilter }) => {
         value={maxPrice}
         onChange={(e) => setMaxPrice(e.target.value)}
         mb={1}
+        position="inherit"
       />
-      <Button colorScheme="blue" onClick={handleFilterApply}>Apply Filter</Button>
+      <Button colorScheme="blue" position="inherit" onClick={handleFilterApply}>
+        Apply Filter
+      </Button>
     </Box>
   );
 };

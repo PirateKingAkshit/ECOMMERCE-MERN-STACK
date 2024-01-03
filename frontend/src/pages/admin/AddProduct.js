@@ -148,6 +148,8 @@ const AddProduct = () => {
         isClosable: true,
         position: "top",
       });
+      setCategoryDesc("")
+      setCategoryName("")
       setLoading(false);
       fetchCategory()
       navigate("/addProduct");
@@ -166,7 +168,7 @@ const AddProduct = () => {
   };
 
   return (
-    <Flex align={"center"} justify={"center"} bg={"gray.50"}>
+    <Flex align={"center"} justify={"center"} bg={"gray.50"} position="inherit">
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12}>
         <Stack align={"center"}>
           <Heading fontSize={"4xl"} textAlign={"center"}>
@@ -185,6 +187,7 @@ const AddProduct = () => {
                       name="name"
                       value={name}
                       onChange={handleNameChange}
+                      position="inherit"
                     />
                   </FormControl>
                 </Box>
@@ -196,6 +199,7 @@ const AddProduct = () => {
                       name="price"
                       value={price}
                       onChange={handlePriceChange}
+                      position="inherit"
                     />
                   </FormControl>
                 </Box>
@@ -207,6 +211,7 @@ const AddProduct = () => {
                   value={description}
                   onChange={handleDescriptionChange}
                   size="lg"
+                  position="inherit"
                 />
               </FormControl>
               <FormControl
@@ -224,11 +229,7 @@ const AddProduct = () => {
                   width="65%"
                 >
                   {category.map((category) => (
-                    <option
-                      key={category._id}
-                      value={category._id}
-                     
-                    >
+                    <option key={category._id} value={category._id}>
                       {category.name}
                     </option>
                   ))}
@@ -250,7 +251,7 @@ const AddProduct = () => {
                     <ModalHeader>Add Category</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                      <form onSubmit={handleAddCategory} id="addCategoryForm">
+                      <FormControl id="addCategoryForm">
                         <FormControl id="categoryName" isRequired>
                           <FormLabel>Category Name</FormLabel>
                           <Input
@@ -273,7 +274,7 @@ const AddProduct = () => {
                             size="lg"
                           />
                         </FormControl>
-                      </form>
+                      </FormControl>
                     </ModalBody>
                     <ModalFooter>
                       <Button
@@ -283,11 +284,7 @@ const AddProduct = () => {
                       >
                         Close
                       </Button>
-                      <Button
-                        colorScheme="green"
-                        type="submit"
-                        form="addCategoryForm"
-                      >
+                      <Button colorScheme="green" onClick={handleAddCategory}>
                         Save
                       </Button>
                     </ModalFooter>

@@ -159,12 +159,12 @@ const Product = () => {
                   <>
                     <Flex>
                       <UpdateProductModal item={product}>
-                        <Button mr={5} colorScheme="yellow" variant="solid">
+                        <Button mr={5} colorScheme="yellow" variant="solid" position="inherit">
                           Update
                         </Button>
                       </UpdateProductModal>
                       <DeleteProductModal item={product}>
-                        <Button colorScheme="red" variant="solid">
+                        <Button colorScheme="red" variant="solid" position="inherit">
                           Delete
                         </Button>
                       </DeleteProductModal>
@@ -173,6 +173,7 @@ const Product = () => {
                 ) : (
                   <>
                     <Button
+                     position="inherit"
                       mt={3}
                       w={"fit-content"}
                       colorScheme="green"

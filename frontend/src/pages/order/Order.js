@@ -113,6 +113,7 @@ const Order = () => {
             key={status}
             onChange={() => handleCheckboxChange(status)}
             isChecked={selectedStatuses.includes(status)}
+            position="inherit"
             mb="2"
           >
             {status}
@@ -170,6 +171,7 @@ const Order = () => {
                           colorScheme="red"
                           mt={4}
                           onClick={() => handleCancelClick(order._id)}
+                          position="inherit"
                         >
                           Cancel Order
                         </Button>
@@ -198,6 +200,7 @@ const Order = () => {
                         <Button
                           colorScheme="teal"
                           mt={4}
+                          position="inherit"
                           onClick={() =>
                             navigate(`/review/${order.product._id}`)
                           }

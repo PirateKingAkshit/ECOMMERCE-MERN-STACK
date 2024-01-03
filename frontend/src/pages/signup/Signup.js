@@ -101,7 +101,7 @@ const Signup = () => {
     <Box
       maxW="md"
       mx="auto"
-      my={8}
+      my={4}
       p={6}
       borderWidth={1}
       borderRadius="lg"
@@ -281,7 +281,7 @@ const Signup = () => {
       <Text mt={2} color="teal.800">
         Not registered yet?{" "}
         <Link to="/login" color="blue.500">
-          Login
+          <span style={{color:"blue"}}>Login</span>
         </Link>
       </Text>
     </Box>

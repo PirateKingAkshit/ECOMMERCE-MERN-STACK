@@ -6,7 +6,11 @@ import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 const ProductReview = ({ fetchedReview, productId }) => {
   return (
     <>
-      <HStack w="100%" justifyContent="space-between" borderWidth={2} p={5}>
+      {
+        fetchedReview && fetchedReview.length > 0 ?
+        
+          <>
+              <HStack w="100%" justifyContent="space-between" borderWidth={2} p={5}>
         <Text fontSize="2xl" fontWeight="bold">
           Ratings & Reviews
         </Text>
@@ -42,6 +46,11 @@ const ProductReview = ({ fetchedReview, productId }) => {
             </HStack>
           </VStack>
         ))}
+          </>
+          :
+          <></>
+      }
+      
     </>
   );
 };

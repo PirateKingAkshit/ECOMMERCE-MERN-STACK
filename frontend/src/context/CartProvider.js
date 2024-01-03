@@ -1,6 +1,6 @@
 import { useToast } from '@chakra-ui/react';
 import axios from 'axios';
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { UserState } from './UserProvider';
 
 
@@ -11,6 +11,7 @@ const CartProvider = ({ children }) => {
     const [cart, setCart] = useState([]);
     const toast = useToast();
     const SHIPPING_CHARGES = 50;
+    const[cartLength,setCartLength]=useState()
 
     const fetchCart = async () => {
       if (user && user.token) {
@@ -25,17 +26,21 @@ const CartProvider = ({ children }) => {
             "http://localhost:8080/api/cart",
             config
           );
-
           if (data) {
             localStorage.setItem("cart", JSON.stringify(data.items));
-            setCart(data.items);
+            setCart(data.items)
+            setCartLength(data.items.length)
           }
           setLoading(false);
         } catch (error) {
           console.log(error);
         }
       }
-    };
+  };
+  
+   useEffect(() => {
+     fetchCart();
+   }, [user]);
 
 
     const decreaseQuantity = async(productId) => {
@@ -107,7 +112,8 @@ const CartProvider = ({ children }) => {
       )
     };
 
-    const removeFromCart = async(productId) => {
+  const removeFromCart = async (productId) => {
+      setCartLength(cartLength - 1);
       const updatedCart = cart.filter((item) => item.product._id !== productId);
       setCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
@@ -132,7 +138,8 @@ const CartProvider = ({ children }) => {
       return total;
     };
 
-    const addToCart = async (productId) => {
+  const addToCart = async (productId) => {
+    setCartLength(cartLength+1)
       if (!user) {
         toast({
           title: `Please Login First To Add Product To Cart`,
@@ -152,14 +159,14 @@ const CartProvider = ({ children }) => {
           },
         };
 
-        const { data } = await axios.post(
+         await axios.post(
           "http://localhost:8080/api/cart/add",
           { product: productId, quantity: 1 },
           config
         );
       } catch (error) {
         console.log(error);
-        // Handle error if needed
+        
       }
     };
 
@@ -167,10 +174,24 @@ const CartProvider = ({ children }) => {
 
 
   return (
-    <CartContext.Provider value={{fetchCart,increaseQuantity,decreaseQuantity,removeFromCart,cartTotal,cart,setCart,SHIPPING_CHARGES,addToCart,loading}}> 
-        {children}
+    <CartContext.Provider
+      value={{
+        fetchCart,
+        increaseQuantity,
+        decreaseQuantity,
+        removeFromCart,
+        cartTotal,
+        cart,
+        setCart,
+        SHIPPING_CHARGES,
+        addToCart,
+        loading,
+        cartLength,
+      }}
+    >
+      {children}
     </CartContext.Provider>
-  )
+  );
 }
 
 export const CartState = () => {

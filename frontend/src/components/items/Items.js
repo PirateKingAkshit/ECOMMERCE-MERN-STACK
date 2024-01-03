@@ -65,12 +65,12 @@ const Items = ({ item }) => {
 
             <Flex justifyContent="space-around">
               <UpdateProductModal item={item}>
-                <Button colorScheme="yellow" variant="solid">
+                <Button colorScheme="yellow" position="inherit" variant="solid">
                   Update
                 </Button>
               </UpdateProductModal>
               <DeleteProductModal item={item}>
-                <Button colorScheme="red" variant="solid">
+                <Button colorScheme="red" position="inherit" variant="solid">
                   Delete
                 </Button>
               </DeleteProductModal>
@@ -98,6 +98,7 @@ const Items = ({ item }) => {
               display={"flex"}
               flexDir={"column"}
               justifyContent={"space-between"}
+              position="inherit"
             >
               <Image
                 src={item.image}
@@ -130,6 +131,7 @@ const Items = ({ item }) => {
                   </Text>
                 )}
                 <Button
+                  position="inherit"
                   w={"100%"}
                   colorScheme="green"
                   variant="solid"
